@@ -75,3 +75,8 @@ Enable loading `.gdbinit`
 echo "set auto-load safe-path $(pwd)" >> ~/.gdbinit
 ```
 
+Running the program
+
+```
+cargo run demo-blinky
+```

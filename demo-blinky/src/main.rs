@@ -14,9 +14,12 @@
 use panic_halt as _;
 
 use nb::block;
-
+use core::fmt::Write;
 use cortex_m_rt::entry;
+use cortex_m_semihosting as sh;
 use stm32f1xx_hal::{pac, prelude::*, timer::Timer};
+
+use sh::hio;
 
 #[entry]
 fn main() -> ! {
@@ -42,12 +45,15 @@ fn main() -> ! {
     let mut led = gpioc.pc13.into_push_pull_output(&mut gpioc.crh);
     // Configure the syst timer to trigger an update every second
     let mut timer = Timer::syst(cp.SYST, &clocks).start_count_down(1.hz());
-
+    let mut hstdout = hio::hstdout().unwrap();
     // Wait for the timer to trigger an update and change the state of the LED
     loop {
         block!(timer.wait()).unwrap();
         led.set_high();
+        let _ = writeln!(hstdout, "ON");
+        
         block!(timer.wait()).unwrap();
         led.set_low();
+        let _ = writeln!(hstdout, "OFF");
     }
 }
