@@ -91,7 +91,7 @@ cargo run demo-blinky
 
 ## Semihosting
 
-Dependencies `cortex-m-semihosting` and `panic-semihosting` enable senging any
-debug prints and panic arrertions onto openocd console via STLink
+Dependencies `cortex-m-semihosting` and `panic-semihosting` enable sending any
+debug prints and panic assertions into openocd console via STLink
 
 Use either `use panic_semihosting as _;` or `use panic_halt as _;`
