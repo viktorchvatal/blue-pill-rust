@@ -4,6 +4,14 @@
 
 https://github.com/stm32-rs/stm32f1xx-hal
 
+## Hardware
+
+Development board (a cheap blue pill clone with STM32F030C8)
+
+https://www.laskarduino.cz/arm-stm32-stm32f030c8-vyvojova-deska/
+
+Programming interface: ST-Link V2 
+
 ## Dependencies
 
 Install Debian 11 packages needed for development
@@ -65,7 +73,7 @@ Polling target stm32f1x.cpu failed, trying to reexamine
 Examination failed, GDB will be halted. Polling again in 700ms
 ```
 
-Start openocd with `reset` putton active
+Start openocd with `reset` button active
 
 ## Running
 
@@ -80,3 +88,10 @@ Running the program
 ```
 cargo run demo-blinky
 ```
+
+## Semihosting
+
+Dependencies `cortex-m-semihosting` and `panic-semihosting` enable senging any
+debug prints and panic arrertions onto openocd console via STLink
+
+Use either `use panic_semihosting as _;` or `use panic_halt as _;`
