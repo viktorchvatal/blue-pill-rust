@@ -39,7 +39,7 @@ fn main() -> ! {
     let clocks = rcc
         .cfgr
         .use_hse(8.mhz())  // use external oscillator (8 MHz)
-        .sysclk(48.mhz())  // system clock, PLL multiplier should be 6
+        .sysclk(72.mhz())  // system clock, PLL multiplier should be 6
         .hclk(8.mhz())     // clock used for timers   
         .freeze(&mut flash.acr);
 
