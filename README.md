@@ -8,14 +8,17 @@ My personal walk through learning Rust development on STM32 family of microcontr
 
 ## Userful Resources
 
-Following links contain a lot of useful resources about STM32 platform and Rust 
+Following links contain a lot of useful resources about STM32 platform and Rust
 
  - https://github.com/stm32-rs/stm32f1xx-hal
  - https://jonathanklimt.de/electronics/programming/embedded-rust/rust-on-stm32-2/
 
 ## Getting Started
 
-[Getting started](doc/getting_started.md) - install development tools and flash the first program
+![stlink v2 photo](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/intro/blinking.gif)
+
+[Getting started](doc/getting_started.md) - learn how to install
+development tools and flash the first program
 
 ## Other
 

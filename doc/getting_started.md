@@ -4,9 +4,13 @@
 
 Development board (a cheap blue pill clone with STM32F030C8)
 
+![blue pill photo](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/intro/intro-blue-pill.jpg)
+
 https://www.laskarduino.cz/arm-stm32-stm32f030c8-vyvojova-deska/
 
 Programming interface: ST-Link V2
+
+![stlink v2 photo](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/intro/intro-stlinkv2.jpg)
 
 ## Dependencies
 
@@ -111,9 +115,24 @@ run without the debugger
 ```
 cargo run demo-blinky-semihosting
 ```
+Green LED should start flashing, 1 second ON, 1 second OFF
 
-Run the standalone blinking demo, runs without active debug session because
-it does not try to send debug output via the debugger
+![stlink v2 photo](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/intro/blinking.gif)
+
+openocd console should show the following output at the same time:
+
+```
+OFF
+ON
+OFF
+ON
+OFF
+ON
+OFF
+```
+
+There is also standalone blinking demo that runs without active debug
+session, but does not have any semihosting output
 
 ```
 cargo run demo-blinky-standalone
