@@ -45,6 +45,9 @@ to the computer using USB port. Pins used are as follows:
 
 ![stlink v2 photo](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/intro/stlink-pinout.jpg)
 
+TODO: Blue pill has na onboard 3.3V voltage regulator, may be it is safe to use
+5.0V pin on ST Link as well?
+
 Open the debugger using STlink v 2
 
 ```
