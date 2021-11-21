@@ -1,5 +1,6 @@
 [workspace]
 
 members = [
-    "demo-blinky",
+    "demo-blinky-semihosting",
+    "demo-blinky-standalone",
 ]
