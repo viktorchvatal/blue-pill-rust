@@ -12,15 +12,18 @@
 #![no_main]
 
 mod hx1230_driver;
+mod hx1230_sw_driver;
 
 use embedded_hal::spi::{Mode, Phase, Polarity};
 use embedded_hal::blocking::spi;
 
+use hx1230_sw_driver::{Hx1230SwDriver, SwSpi};
 use panic_semihosting as _;
 
 use cortex_m_rt::entry;
 use cortex_m_semihosting as sh;
 use stm32f1xx_hal::delay::Delay;
+use stm32f1xx_hal::gpio::{Alternate, CRH, Output, Pin, PushPull};
 use stm32f1xx_hal::{pac, prelude::*, spi::{NoMiso, Spi}};
 
 use hx1230_driver::Hx1230Driver;
@@ -62,46 +65,74 @@ fn main() -> ! {
     let mut display_reset = gpiob.pb12.into_push_pull_output(&mut gpiob.crh);
 
     // SPI2, we use only output, so there is no miso input
-    let sck = gpiob.pb13.into_alternate_push_pull(&mut gpiob.crh);
-    let mosi = gpiob.pb15.into_alternate_push_pull(&mut gpiob.crh);
-
-    let mut spi = Spi::spi2(
-        dp.SPI2,
-        (sck, NoMiso, mosi),
-        SPI_MODE,
-        100.khz(),
-        clocks,
-    );
+    let sck = gpiob.pb13.into_push_pull_output(&mut gpiob.crh);
+    let mosi = gpiob.pb15.into_push_pull_output(&mut gpiob.crh);
 
     let mut delay = Delay::new(cp.SYST, clocks);
 
-    let display = Hx1230Driver::new(&spi);
+    let mut sw_spi = DisplaySpi {
+        mosi,
+        sck,
+        reset: display_reset,
+        delay,
+        delay_us: 1,
+        delay_init_us: 100,
+    };
 
-    display_reset.set_low();
-    delay.delay_us(100_u16);
-    display_reset.set_high();
+    let display = Hx1230SwDriver::new();
 
-    display.init(&mut spi, &mut delay);
+    display.init(&mut sw_spi);
 
     loop {
         led.set_low();
 
-        display_reset.set_low();
-        delay.delay_us(100_u16);
-        display_reset.set_high();
-        display.init(&mut spi, &mut delay);
+        display.init(&mut sw_spi);
 
-        display.set_display_test(&mut spi, true);
-        // delay.delay_ms(100_u16);
+        display.set_display_test(&mut sw_spi, true);
+        // sw_spi.delay.delay_ms(100_u16);
 
         led.set_high();
 
-        display_reset.set_low();
-        delay.delay_us(100_u16);
-        display_reset.set_high();
-        display.init(&mut spi, &mut delay);
+        display.init(&mut sw_spi);
 
-        display.set_display_test(&mut spi, false);
-        // delay.delay_ms(100_u16);
+        display.set_display_test(&mut sw_spi, true);
+        // sw_spi.delay.delay_ms(100_u16);
+    }
+}
+
+struct DisplaySpi {
+    sck: Pin<Output<PushPull>, CRH, 'B', 13>,
+    mosi: Pin<Output<PushPull>, CRH, 'B', 15>,
+    reset: Pin<Output<PushPull>, CRH, 'B', 12>,
+    delay: Delay,
+    delay_us: u16,
+    delay_init_us: u16,
+}
+
+impl SwSpi for DisplaySpi {
+    fn hw_reset(&mut self) {
+        self.reset.set_low();
+        self.delay.delay_us(self.delay_init_us);
+        self.reset.set_high();
+    }
+
+    fn mosi_set_high(&mut self) {
+        self.mosi.set_high();
+    }
+
+    fn mosi_set_low(&mut self) {
+        self.mosi.set_low();
+    }
+
+    fn sck_toggle_high_low(&mut self) {
+        self.delay.delay_us(self.delay_us);
+        self.sck.set_high();
+        self.delay.delay_us(self.delay_us);
+        self.sck.set_low();
+        self.delay.delay_us(self.delay_us);
+    }
+
+    fn long_init_delay(&mut self) {
+        self.delay.delay_us(self.delay_init_us);
     }
 }

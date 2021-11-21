@@ -1,29 +1,25 @@
-use core::marker::PhantomData;
-use core::fmt::Debug;
-
-use cortex_m::prelude::{_embedded_hal_blocking_delay_DelayUs};
-use embedded_hal::blocking::spi;
-use stm32f1xx_hal::{delay::Delay};
-
-pub struct Hx1230Driver<SPI, E> {
-    _phantom_spi: PhantomData<SPI>,
-    _phantom_err: PhantomData<E>,
+pub trait SwSpi {
+    fn hw_reset(&mut self);
+    fn mosi_set_high(&mut self);
+    fn mosi_set_low(&mut self);
+    fn sck_toggle_high_low(&mut self);
+    fn long_init_delay(&mut self);
 }
 
-impl<SPI, E> Hx1230Driver<SPI, E>
-where SPI: spi::Transfer<u8, Error = E> + spi::Write<u8, Error = E>,
-      E: Debug {
-    pub fn new(_spi: &SPI) -> Self {
-        Self {
-            _phantom_spi: PhantomData,
-            _phantom_err: PhantomData,
-        }
+pub struct Hx1230SwDriver {
+
+}
+
+impl Hx1230SwDriver {
+    pub fn new() -> Self {
+        Self { }
     }
 
-    pub fn init(&self, spi: &mut SPI, delay: &mut Delay) {
-        delay.delay_us(100_u16);
+    pub fn init(&self, spi: &mut dyn SwSpi) {
+        spi.hw_reset();
+        spi.long_init_delay();
         self.command(spi, SW_RESET);
-        delay.delay_us(100_u16);
+        spi.long_init_delay();
         self.command(spi, POWER_ON);
         self.set_contrast(spi, 30);
         self.command(spi, INVERT_OFF);
@@ -36,24 +32,33 @@ where SPI: spi::Transfer<u8, Error = E> + spi::Write<u8, Error = E>,
     }
 
     // Set contrast to value 0 - 31
-    pub fn set_contrast(&self, spi: &mut SPI, value: u8) {
+    pub fn set_contrast(&self, spi: &mut dyn SwSpi, value: u8) {
         self.command(spi, CONTRAST | (0b00011111 & value));
     }
 
     // Set start line to value 0 - 63
-    pub fn set_line(&self, spi: &mut SPI, value: u8) {
+    pub fn set_line(&self, spi: &mut dyn SwSpi, value: u8) {
         self.command(spi, START_LINE | (0b00111111 & value));
     }
 
-    pub fn set_display_test(&self, spi: &mut SPI, value: bool) {
+    pub fn set_display_test(&self, spi: &mut dyn SwSpi, value: bool) {
         match value {
             true => self.command(spi, DISPLAY_TEST),
             false => self.command(spi, DISPLAY_NORMAL),
         }
     }
 
-    fn command(&self, spi: &mut SPI, command: u8) {
-        spi.write(&[command >> 1, (command << 7) & 0x80]).unwrap();
+    fn command(&self,  spi: &mut dyn SwSpi, command: u8) {
+        self.output_bit(spi, 0);
+
+        for shift in 0u8..=7u8 {
+            self.output_bit(spi, command >> (7 - shift));
+        }
+    }
+
+    fn output_bit(&self,  spi: &mut dyn SwSpi, bit: u8) {
+        if bit & 0x01 == 1 { spi.mosi_set_high() } else { spi.mosi_set_low() };
+        spi.sck_toggle_high_low();
     }
 }
 
