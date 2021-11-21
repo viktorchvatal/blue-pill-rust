@@ -1,6 +1,10 @@
 # Rust blue pill learning demo
 
-My personal walk through learning Rust development on STM32 family of microcontrollers
+My personal walk through learning Rust development on STM32 family of microcontrollers, using:
+
+ - Blue Pill development board with STM32F030C8 microcontroller as target device
+ - STLink v2 as a programming and debugging interface
+ - Debian 11 bullseye and Visual studio code as development environment
 
 ## Userful Resources
 
