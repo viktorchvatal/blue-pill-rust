@@ -40,6 +40,11 @@ cargo build
 
 ## Starting the debugger
 
+Connet the ST Link debugger to the blue pill development board and
+to the computer using USB port. Pins used are as follows:
+
+![stlink v2 photo](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/intro/stlink-pinout.jpg)
+
 Open the debugger using STlink v 2
 
 ```
