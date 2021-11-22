@@ -18,16 +18,15 @@ impl Hx1230SwDriver {
     pub fn init(&self, spi: &mut dyn SwSpi) {
         spi.hw_reset();
         spi.long_init_delay();
-        self.command(spi, SW_RESET);
-        spi.long_init_delay();
-        self.command(spi, POWER_ON);
-        self.set_contrast(spi, 30);
-        self.command(spi, INVERT_OFF);
-        self.command(spi, DISPLAY_NORMAL);
-        self.command(spi, SEG_NORMAL);
-        self.command(spi, COM_NORMAL);
-        self.command(spi, DISPLAY_ON);
-        self.set_line(spi, 0);
+        self.command(spi, 0x21);
+        self.command(spi, 0xB8);
+        self.command(spi, 0x04);
+        self.command(spi, 0x14);
+        self.command(spi, 0x20);
+        self.command(spi, 0x0C);
+
+        // https://www.sparkfun.com/datasheets/LCD/Monochrome/Nokia5110.pdf
+        // https://e2e.ti.com/support/microcontrollers/arm-based-microcontrollers-group/arm-based-microcontrollers/f/arm-based-microcontrollers-forum/401871/tm4c123g6pm-and-initialization-of-the-lcd-with-pcd8544-on-assembly-lang
 
     }
 

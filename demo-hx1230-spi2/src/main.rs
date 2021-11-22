@@ -89,14 +89,14 @@ fn main() -> ! {
         display.init(&mut sw_spi);
 
         display.set_display_test(&mut sw_spi, true);
-        // sw_spi.delay.delay_ms(100_u16);
+        sw_spi.delay.delay_ms(100_u16);
 
         led.set_high();
 
         display.init(&mut sw_spi);
 
         display.set_display_test(&mut sw_spi, true);
-        // sw_spi.delay.delay_ms(100_u16);
+        sw_spi.delay.delay_ms(100_u16);
     }
 }
 
