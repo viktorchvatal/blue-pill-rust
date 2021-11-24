@@ -9,6 +9,9 @@ nb = "1"
 cortex-m = "0.7"
 cortex-m-rt = "0.7"
 
+lib-common = { path = "../lib-common" }
+lib-display-hx1230 = { path = "../lib-display-hx1230" }
+
 [dependencies.stm32f1xx-hal]
 git = "https://github.com/stm32-rs/stm32f1xx-hal.git"
 features = ["rt", "stm32f103", "medium"]

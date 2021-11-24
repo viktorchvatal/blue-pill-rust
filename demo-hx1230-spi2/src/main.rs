@@ -10,8 +10,6 @@
 #![no_std]
 #![no_main]
 
-mod hx1230_driver;
-
 use core::panic::PanicInfo;
 
 use embedded_hal::spi::{Mode, Phase, Polarity};
@@ -20,7 +18,8 @@ use cortex_m_rt::entry;
 use stm32f1xx_hal::delay::Delay;
 use stm32f1xx_hal::{pac, prelude::*, spi::{NoMiso, Spi}};
 
-use hx1230_driver::{Hx1230Driver, SimpleResultExt};
+use lib_common::MiniResultExt;
+use lib_display_hx1230::{Driver as LcdDriver, Command as LcdCommand};
 
 pub const SPI_MODE: Mode = Mode {
     phase: Phase::CaptureOnFirstTransition,
@@ -72,18 +71,18 @@ fn main() -> ! {
 
     let mut delay = Delay::new(cp.SYST, clocks);
 
-    let mut display = Hx1230Driver::new(&mut spi, &mut display_cs);
-    display.sw_reset().check();
+    let mut display = LcdDriver::new(&mut spi, &mut display_cs);
+    display.command(LcdCommand::reset()).check();
     delay.delay_us(100_u16);
     display.init_sequence().check();
 
     loop {
         led.set_high();
-        display.set_invert(true).check();
+        display.command(LcdCommand::invert_on()).check();
         delay.delay_ms(30_u16);
 
         led.set_low();
-        display.set_invert(false).check();
+        display.command(LcdCommand::invert_off()).check();
         delay.delay_ms(30_u16);
     }
 }
