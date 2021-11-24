@@ -59,7 +59,7 @@ fn main() -> ! {
     // Configure gpio C pin 13 as a push-pull output. The `crh` register is passed to the function
     // in order to configure the port. For pins 0-7, crl should be passed instead.
     let mut led = gpioc.pc13.into_push_pull_output(&mut gpioc.crh);
-    let mut display_reset = gpiob.pb12.into_push_pull_output(&mut gpiob.crh);
+    let mut display_cs = gpiob.pb12.into_push_pull_output(&mut gpiob.crh);
 
     // SPI2, we use only output, so there is no miso input
     let sck = gpiob.pb13.into_alternate_push_pull(&mut gpiob.crh);
@@ -69,39 +69,23 @@ fn main() -> ! {
         dp.SPI2,
         (sck, NoMiso, mosi),
         SPI_MODE,
-        100.khz(),
+        4.mhz(),
         clocks,
     );
 
     let mut delay = Delay::new(cp.SYST, clocks);
 
-    let display = Hx1230Driver::new(&spi);
+    let display = Hx1230Driver::new(&spi, &display_cs);
 
-    display_reset.set_low();
-    delay.delay_us(100_u16);
-    display_reset.set_high();
-
-    display.init(&mut spi, &mut delay);
+    display.init(&mut spi, &mut display_cs, &mut delay);
 
     loop {
-        led.set_low();
-
-        display_reset.set_low();
-        delay.delay_us(100_u16);
-        display_reset.set_high();
-        display.init(&mut spi, &mut delay);
-
-        display.set_display_test(&mut spi, true);
-        // delay.delay_ms(100_u16);
-
         led.set_high();
+        display.set_display_test(&mut spi, &mut display_cs, true);
+        delay.delay_ms(100_u16);
 
-        display_reset.set_low();
-        delay.delay_us(100_u16);
-        display_reset.set_high();
-        display.init(&mut spi, &mut delay);
-
-        display.set_display_test(&mut spi, false);
-        // delay.delay_ms(100_u16);
+        led.set_low();
+        display.set_display_test(&mut spi, &mut display_cs, false);
+        delay.delay_ms(100_u16);
     }
 }

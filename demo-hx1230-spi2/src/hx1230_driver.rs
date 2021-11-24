@@ -2,57 +2,62 @@ use core::marker::PhantomData;
 use core::fmt::Debug;
 
 use cortex_m::prelude::{_embedded_hal_blocking_delay_DelayUs};
-use embedded_hal::blocking::spi;
-use stm32f1xx_hal::{delay::Delay};
+use embedded_hal::{blocking::spi, digital::v2::OutputPin};
+use stm32f1xx_hal::{delay::Delay, gpio::{Output, Pin, PushPull}};
 
-pub struct Hx1230Driver<SPI, E> {
+pub struct Hx1230Driver<SPI, E, CS> {
     _phantom_spi: PhantomData<SPI>,
     _phantom_err: PhantomData<E>,
+    _phantom_cs: PhantomData<CS>,
 }
 
-impl<SPI, E> Hx1230Driver<SPI, E>
+impl<SPI, E, CS> Hx1230Driver<SPI, E, CS>
 where SPI: spi::Transfer<u8, Error = E> + spi::Write<u8, Error = E>,
-      E: Debug {
-    pub fn new(_spi: &SPI) -> Self {
+      E: Debug,
+      CS: OutputPin {
+    pub fn new(_spi: &SPI, _cs: &CS) -> Self {
         Self {
             _phantom_spi: PhantomData,
             _phantom_err: PhantomData,
+            _phantom_cs: PhantomData,
         }
     }
 
-    pub fn init(&self, spi: &mut SPI, delay: &mut Delay) {
-        self.command(spi, SW_RESET);
+    pub fn init(&self, spi: &mut SPI, cs: &mut CS, delay: &mut Delay) {
+        self.command(spi, cs, SW_RESET);
         delay.delay_us(100_u16);
-        // self.command(spi, POWER_ON);
-        // self.set_contrast(spi, 30);
-        // self.command(spi, INVERT_OFF);
-        // self.command(spi, DISPLAY_NORMAL);
-        // self.command(spi, SEG_NORMAL);
-        // self.command(spi, COM_NORMAL);
-        // self.command(spi, DISPLAY_ON);
-        // self.set_line(spi, 0);
+        self.command(spi, cs, POWER_ON);
+        self.set_contrast(spi, cs, 30);
+        self.command(spi, cs, INVERT_OFF);
+        self.command(spi, cs, DISPLAY_NORMAL);
+        self.command(spi, cs, SEG_NORMAL);
+        self.command(spi, cs, COM_NORMAL);
+        self.command(spi, cs, DISPLAY_ON);
+        self.set_line(spi, cs, 0);
 
     }
 
     // Set contrast to value 0 - 31
-    pub fn set_contrast(&self, spi: &mut SPI, value: u8) {
-        self.command(spi, CONTRAST | (0b00011111 & value));
+    pub fn set_contrast(&self, spi: &mut SPI, cs: &mut CS, value: u8) {
+        self.command(spi, cs, CONTRAST | (0b00011111 & value));
     }
 
     // Set start line to value 0 - 63
-    pub fn set_line(&self, spi: &mut SPI, value: u8) {
-        self.command(spi, START_LINE | (0b00111111 & value));
+    pub fn set_line(&self, spi: &mut SPI, cs: &mut CS, value: u8) {
+        self.command(spi, cs, START_LINE | (0b00111111 & value));
     }
 
-    pub fn set_display_test(&self, spi: &mut SPI, value: bool) {
+    pub fn set_display_test(&self, spi: &mut SPI, cs: &mut CS, value: bool) {
         match value {
-            true => self.command(spi, DISPLAY_TEST),
-            false => self.command(spi, DISPLAY_NORMAL),
+            true => self.command(spi, cs, DISPLAY_TEST),
+            false => self.command(spi, cs, DISPLAY_NORMAL),
         }
     }
 
-    fn command(&self, spi: &mut SPI, command: u8) {
+    fn command(&self, spi: &mut SPI, cs: &mut CS, command: u8) {
+        cs.set_low();
         spi.write(&[command >> 1, (command << 7) & 0x80]).unwrap();
+        cs.set_high();
     }
 }
 
