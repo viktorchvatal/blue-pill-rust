@@ -2,6 +2,21 @@ use embedded_hal::{blocking::spi, digital::v2::OutputPin};
 
 pub type SimpleResult = Result<(), ()>;
 
+pub trait SimpleResultExt {
+    // Check if there is an error in result and panic if there is,
+    // but without any formatted message so it does not generate formatting
+    // code
+    fn check(&self);
+}
+
+impl SimpleResultExt for SimpleResult {
+    fn check(&self) {
+        if self.is_err() {
+            panic!();
+        }
+    }
+}
+
 pub struct Hx1230Driver<'a, SPI, CS> {
     spi: &'a mut SPI,
     cs: &'a mut CS,
@@ -55,6 +70,7 @@ where SPI: spi::Transfer<u8> + spi::Write<u8>,
         }
     }
 
+    #[inline(never)]
     fn command(&mut self, command: u8) -> SimpleResult {
         // Errors are ignored for now
         self.cs.set_low().map_err(|_| ())?;

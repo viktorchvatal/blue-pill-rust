@@ -20,7 +20,7 @@ use cortex_m_rt::entry;
 use stm32f1xx_hal::delay::Delay;
 use stm32f1xx_hal::{pac, prelude::*, spi::{NoMiso, Spi}};
 
-use hx1230_driver::Hx1230Driver;
+use hx1230_driver::{Hx1230Driver, SimpleResultExt};
 
 pub const SPI_MODE: Mode = Mode {
     phase: Phase::CaptureOnFirstTransition,
@@ -73,17 +73,17 @@ fn main() -> ! {
     let mut delay = Delay::new(cp.SYST, clocks);
 
     let mut display = Hx1230Driver::new(&mut spi, &mut display_cs);
-    display.sw_reset().unwrap();
+    display.sw_reset().check();
     delay.delay_us(100_u16);
-    display.init_sequence().unwrap();
+    display.init_sequence().check();
 
     loop {
         led.set_high();
-        display.set_invert(true).unwrap();
+        display.set_invert(true).check();
         delay.delay_ms(30_u16);
 
         led.set_low();
-        display.set_invert(false).unwrap();
+        display.set_invert(false).check();
         delay.delay_ms(30_u16);
     }
 }
