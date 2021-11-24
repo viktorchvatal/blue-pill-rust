@@ -1,65 +1,70 @@
-use core::marker::PhantomData;
-use core::fmt::Debug;
-
-use cortex_m::prelude::{_embedded_hal_blocking_delay_DelayUs};
 use embedded_hal::{blocking::spi, digital::v2::OutputPin};
-use stm32f1xx_hal::{delay::Delay, gpio::{Output, Pin, PushPull}};
 
-pub struct Hx1230Driver<'a, SPI, E, CS> {
+pub type SimpleResult = Result<(), ()>;
+
+pub struct Hx1230Driver<'a, SPI, CS> {
     spi: &'a mut SPI,
     cs: &'a mut CS,
-    _phantom_err: PhantomData<E>,
 }
 
-impl<'a, SPI, E, CS> Hx1230Driver<'a, SPI, E, CS>
-where SPI: spi::Transfer<u8, Error = E> + spi::Write<u8, Error = E>,
-      E: Debug,
+impl<'a, SPI, CS> Hx1230Driver<'a, SPI, CS>
+where SPI: spi::Transfer<u8> + spi::Write<u8>,
       CS: OutputPin {
     pub fn new(spi: &'a mut SPI, cs: &'a mut CS) -> Self {
-        Self {
-            spi,
-            cs,
-            _phantom_err: PhantomData,
-        }
+        Self { spi, cs, }
     }
 
-    pub fn sw_reset(&mut self) {
-        self.command(SW_RESET);
+    pub fn sw_reset(&mut self) -> SimpleResult {
+        self.command(SW_RESET)
     }
 
-    pub fn init_sequence(&mut self) {
-        self.command(POWER_ON);
-        self.set_contrast(30);
-        self.command(INVERT_OFF);
-        self.command(DISPLAY_NORMAL);
-        self.command(SEG_NORMAL);
-        self.command(COM_NORMAL);
-        self.command(DISPLAY_ON);
-        self.set_line(0);
+    pub fn init_sequence(&mut self) -> SimpleResult {
+        self.command(POWER_ON)?;
+        self.set_contrast(30)?;
+        self.command(INVERT_OFF)?;
+        self.command(DISPLAY_NORMAL)?;
+        self.command(SEG_NORMAL)?;
+        self.command(COM_NORMAL)?;
+        self.command(DISPLAY_ON)?;
+        self.set_line(0)?;
+        Ok(())
 
     }
 
     // Set contrast to value 0 - 31
-    pub fn set_contrast(&mut self, value: u8) {
-        self.command(CONTRAST | (0b00011111 & value));
+    pub fn set_contrast(&mut self, value: u8) -> SimpleResult {
+        self.command(CONTRAST | (0b00011111 & value))
     }
 
     // Set start line to value 0 - 63
-    pub fn set_line(&mut self, value: u8) {
-        self.command(START_LINE | (0b00111111 & value));
+    pub fn set_line(&mut self, value: u8) -> SimpleResult {
+        self.command(START_LINE | (0b00111111 & value))
     }
 
-    pub fn set_display_test(&mut self, value: bool) {
+    pub fn set_display_test(&mut self, value: bool) -> SimpleResult {
         match value {
             true => self.command(DISPLAY_TEST),
             false => self.command(DISPLAY_NORMAL),
         }
     }
 
-    fn command(&mut self, command: u8) {
-        self.cs.set_low();
-        self.spi.write(&[command >> 1, (command << 7) & 0x80]).unwrap();
-        self.cs.set_high();
+    pub fn set_invert(&mut self, value: bool) -> SimpleResult {
+        match value {
+            true => self.command(INVERT_ON),
+            false => self.command(INVERT_OFF),
+        }
+    }
+
+    fn command(&mut self, command: u8) -> SimpleResult {
+        // Errors are ignored for now
+        self.cs.set_low().map_err(|_| ())?;
+
+        let _ = self.spi
+            .write(&[command >> 1, (command << 7) & 0x80])
+            .map_err(|_| ())?;
+
+        let _ = self.cs.set_high().map_err(|_| ())?;
+        Ok(())
     }
 }
 

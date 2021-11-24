@@ -7,19 +7,16 @@
 //!
 //! Original source: https://github.com/stm32-rs/stm32f1xx-hal/blob/master/examples/blinky.rs
 
-#![deny(unsafe_code)]
 #![no_std]
 #![no_main]
 
 mod hx1230_driver;
 
-use embedded_hal::spi::{Mode, Phase, Polarity};
-use embedded_hal::blocking::spi;
+use core::panic::PanicInfo;
 
-use panic_semihosting as _;
+use embedded_hal::spi::{Mode, Phase, Polarity};
 
 use cortex_m_rt::entry;
-use cortex_m_semihosting as sh;
 use stm32f1xx_hal::delay::Delay;
 use stm32f1xx_hal::{pac, prelude::*, spi::{NoMiso, Spi}};
 
@@ -76,17 +73,26 @@ fn main() -> ! {
     let mut delay = Delay::new(cp.SYST, clocks);
 
     let mut display = Hx1230Driver::new(&mut spi, &mut display_cs);
-    display.sw_reset();
+    display.sw_reset().unwrap();
     delay.delay_us(100_u16);
-    display.init_sequence();
+    display.init_sequence().unwrap();
 
     loop {
         led.set_high();
-        display.set_display_test(true);
-        delay.delay_ms(100_u16);
+        display.set_invert(true).unwrap();
+        delay.delay_ms(30_u16);
 
         led.set_low();
-        display.set_display_test(false);
-        delay.delay_ms(100_u16);
+        display.set_invert(false).unwrap();
+        delay.delay_ms(30_u16);
     }
+}
+
+#[panic_handler]
+fn on_panic(_info: &PanicInfo) -> ! {
+    let dp = unsafe { pac::Peripherals::steal() };
+    let mut gpiob = dp.GPIOB.split();
+    let mut panic_led = gpiob.pb11.into_push_pull_output(&mut gpiob.crh);
+    panic_led.set_high();
+    loop { }
 }
