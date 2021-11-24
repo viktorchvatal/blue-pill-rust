@@ -75,17 +75,18 @@ fn main() -> ! {
 
     let mut delay = Delay::new(cp.SYST, clocks);
 
-    let display = Hx1230Driver::new(&spi, &display_cs);
-
-    display.init(&mut spi, &mut display_cs, &mut delay);
+    let mut display = Hx1230Driver::new(&mut spi, &mut display_cs);
+    display.sw_reset();
+    delay.delay_us(100_u16);
+    display.init_sequence();
 
     loop {
         led.set_high();
-        display.set_display_test(&mut spi, &mut display_cs, true);
+        display.set_display_test(true);
         delay.delay_ms(100_u16);
 
         led.set_low();
-        display.set_display_test(&mut spi, &mut display_cs, false);
+        display.set_display_test(false);
         delay.delay_ms(100_u16);
     }
 }
