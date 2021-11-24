@@ -21,7 +21,7 @@ impl Hx1230SwDriver {
         self.command(spi, SW_RESET);
         spi.long_init_delay();
         self.command(spi, POWER_ON);
-        self.set_contrast(spi, 30);
+        self.set_contrast(spi, 31);
         self.command(spi, INVERT_OFF);
         self.command(spi, DISPLAY_NORMAL);
         self.command(spi, SEG_NORMAL);
