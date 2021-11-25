@@ -1,3 +1,5 @@
+use core::cmp::min;
+
 use embedded_hal::{blocking::spi, digital::v2::OutputPin};
 use lib_common::MiniResult;
 
@@ -14,14 +16,7 @@ impl<'a, SPI: spi::Write<u8>, CS: OutputPin> Driver<'a, SPI, CS> {
     }
 
     pub fn init_sequence(&mut self) -> MiniResult {
-        self.command(Command::power_on())?;
-        self.command(Command::set_contrast(30))?;
-        self.command(Command::display_test_off())?;
-        self.command(Command::horizontal_flip_off())?;
-        self.command(Command::vertical_flip_off())?;
-        self.command(Command::invert_off())?;
-        self.command(Command::display_on())?;
-        self.reset_position()
+        self.transmit(INIT_COMMANDS, true)
     }
 
     pub fn set_column(&mut self, column: u8) -> MiniResult {
@@ -38,7 +33,7 @@ impl<'a, SPI: spi::Write<u8>, CS: OutputPin> Driver<'a, SPI, CS> {
         self.reset_position()?;
 
         for _ in 0..12*9 {
-            self.multiple_data(&[0; 8])?;
+            self.send_data(&[0; 8])?;
         }
 
         self.reset_position()
@@ -46,47 +41,64 @@ impl<'a, SPI: spi::Write<u8>, CS: OutputPin> Driver<'a, SPI, CS> {
 
     #[inline(never)]
     pub fn command(&mut self, command: Command) -> MiniResult {
-        self.cs.set_low().map_err(|_| ())?;
-        let val = command.value();
-        let _ = self.spi.write(&[val >> 1, (val << 7) & 0x80]).map_err(|_| ())?;
-        let _ = self.cs.set_high().map_err(|_| ())?;
-        Ok(())
+        self.transmit(&[command.value()], true)
     }
 
-    /// Write one byte of data, data written to display have to be 9 bits,
-    /// but 16 bits (including padding bits) are emitted with SPI interface as
-    /// it does not support 9 bit output
-    #[inline(never)]
-    pub fn data(&mut self, data: u8) -> MiniResult {
-        self.cs.set_low().map_err(|_| ())?;
+    pub fn send_data(&mut self, data: &[u8]) -> MiniResult {
+        self.transmit(data, false)
+    }
 
-        self.spi
-            .write(&[0x80 | (data >> 1), (data << 7) & 0x80])
-            .map_err(|_| ())?;
-
-        self.cs.set_high().map_err(|_| ())?;
-        Ok(())
+    pub fn send_commands(&mut self, commands: &[u8]) -> MiniResult {
+        self.transmit(commands, true)
     }
 
     /// Write 64 bits of data using 72bits (9 bytes) emitted through SPI
     #[inline(never)]
-    pub fn multiple_data(&mut self, data: &[u8; 8]) -> MiniResult {
-        self.cs.set_low().map_err(|_| ())?;
+    fn transmit(&mut self, data: &[u8], is_command: bool) -> MiniResult {
+        let flag = (!is_command) as u8;
+        let data_len = data.len();
 
-        let output: [u8; 9] = [
-            (1 << 7) | (data[0] >> 1),
-            (1 << 6) | (data[0] << 7) | data[1] >> 2,
-            (1 << 5) | (data[1] << 6) | data[2] >> 3,
-            (1 << 4) | (data[2] << 5) | data[3] >> 4,
-            (1 << 3) | (data[3] << 4) | data[4] >> 5,
-            (1 << 2) | (data[4] << 3) | data[5] >> 6,
-            (1 << 1) | (data[5] << 2) | data[6] >> 7,
-            (1 << 0) | (data[6] << 1),
-                       (data[7] << 0),
-        ];
+        let max: usize = data_len/8 + (data_len % 8 > 0) as usize;
 
-        let _ = self.spi.write(&output).map_err(|_| ())?;
-        let _ = self.cs.set_high().map_err(|_| ())?;
+        for block_id in 0..max {
+            let block_start = min(block_id*8, data.len());
+            let block_end = min(block_id*8+8, data.len());
+            let block = &data[block_start..block_end];
+
+            let len = block.len();
+            let mut buffer = [0u8; 9];
+
+            for shift in 0..len {
+                buffer[shift] |= flag << (7 - shift);
+
+                if shift == 7 {
+                    buffer[shift + 1] = block[shift];
+                } else {
+                    buffer[shift] |= block[shift] >> (shift + 1);
+                    buffer[shift + 1] |= block[shift] << (7 - shift);
+                }
+            }
+
+            let output = if len == 8 { &buffer[..] } else { &buffer[0..(len+1)] };
+
+            self.cs.set_low().map_err(|_| ())?;
+            self.spi.write(output).map_err(|_| ())?;
+            self.cs.set_high().map_err(|_| ())?;
+        }
+
         Ok(())
     }
 }
+
+const INIT_COMMANDS: &[u8] = &[
+    Command::power_on().value(),
+    Command::set_contrast(30).value(),
+    Command::display_test_off().value(),
+    Command::horizontal_flip_off().value(),
+    Command::vertical_flip_off().value(),
+    Command::invert_off().value(),
+    Command::display_on().value(),
+    Command::set_column_low(0).value(),
+    Command::set_column_high(0).value(),
+    Command::set_page(0).value(),
+];

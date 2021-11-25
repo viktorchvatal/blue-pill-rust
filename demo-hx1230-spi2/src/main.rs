@@ -65,7 +65,7 @@ fn main() -> ! {
         display.reset_position().check();
 
         for _index in 0..12*8 {
-            display.multiple_data(&TRIANGLE).check();
+            display.send_data(&TRIANGLE).check();
         }
 
         delay.delay_ms(300_u16);
@@ -75,7 +75,7 @@ fn main() -> ! {
         display.reset_position().check();
 
         for _index in 0..12*8 {
-            display.multiple_data(&WAVE).check();
+            display.send_data(&WAVE).check();
         }
 
         delay.delay_ms(300_u16);
