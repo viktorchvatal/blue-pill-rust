@@ -77,6 +77,21 @@ impl Command {
         Self(0x40 | (0b00111111 & line))
     }
 
+    /// Set page (0 - 9) - y coordinate byte
+    pub fn set_page(page: u8) -> Self {
+        Self(0xB0 | (0b00001111 & page))
+    }
+
+    /// Set column low 3 bits (0 - 63) - x coordinate
+    pub fn set_column_low(column: u8) -> Self {
+        Self(0b00001111 & column)
+    }
+
+    /// Set column low 3 bits (0 - 63) - x coordinate
+    pub fn set_column_high(column: u8) -> Self {
+        Self(0b00010000 | (column & 0b00000111))
+    }
+
     pub fn value(&self) -> u8 {
         self.0
     }

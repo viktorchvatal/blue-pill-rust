@@ -1,12 +1,3 @@
-//! Blinks an LED and outputs ON and OFF debug messages via semihosting i/o
-//!
-//! This assumes that a LED is connected to pc13 as is the case on the blue pill board.
-//!
-//! Note: Without additional hardware, PC13 should not be used to drive an LED, see page 5.1.2 of
-//! the reference manual for an explanation. This is not an issue on the blue pill.
-//!
-//! Original source: https://github.com/stm32-rs/stm32f1xx-hal/blob/master/examples/blinky.rs
-
 #![no_std]
 #![no_main]
 
@@ -28,15 +19,10 @@ pub const SPI_MODE: Mode = Mode {
 
 #[entry]
 fn main() -> ! {
-    // Get access to the core peripherals from the cortex-m crate
     let cp = cortex_m::Peripherals::take().unwrap();
-    // Get access to the device specific peripherals from the peripheral access crate
     let dp = pac::Peripherals::take().unwrap();
 
-    // Take ownership over the raw flash and rcc devices and convert them into the corresponding
-    // HAL structs
     let mut flash = dp.FLASH.constrain();
-
     let rcc = dp.RCC.constrain();
 
     // Freeze the configuration of all the clocks in the system and store the frozen frequencies in
@@ -48,12 +34,9 @@ fn main() -> ! {
         .hclk(8.mhz())     // clock used for timers
         .freeze(&mut flash.acr);
 
-    // Acquire the GPIOC peripheral
     let mut gpiob = dp.GPIOB.split();
     let mut gpioc = dp.GPIOC.split();
 
-    // Configure gpio C pin 13 as a push-pull output. The `crh` register is passed to the function
-    // in order to configure the port. For pins 0-7, crl should be passed instead.
     let mut led = gpioc.pc13.into_push_pull_output(&mut gpioc.crh);
     let mut display_cs = gpiob.pb12.into_push_pull_output(&mut gpiob.crh);
 
@@ -75,15 +58,27 @@ fn main() -> ! {
     display.command(LcdCommand::reset()).check();
     delay.delay_us(100_u16);
     display.init_sequence().check();
+    display.clear_data().check();
 
     loop {
         led.set_high();
-        display.command(LcdCommand::invert_on()).check();
-        delay.delay_ms(30_u16);
+        display.reset_position().check();
+
+        for _index in 0..12*8 {
+            display.multiple_data(&TRIANGLE).check();
+        }
+
+        delay.delay_ms(300_u16);
 
         led.set_low();
-        display.command(LcdCommand::invert_off()).check();
-        delay.delay_ms(30_u16);
+
+        display.reset_position().check();
+
+        for _index in 0..12*8 {
+            display.multiple_data(&WAVE).check();
+        }
+
+        delay.delay_ms(300_u16);
     }
 }
 
@@ -95,3 +90,16 @@ fn on_panic(_info: &PanicInfo) -> ! {
     panic_led.set_high();
     loop { }
 }
+
+const TRIANGLE: [u8; 8] = [0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3F, 0x7F, 0xFF];
+
+const WAVE : [u8; 8] = [
+    0b01001000,
+    0b00100100,
+    0b00010010,
+    0b00010010,
+    0b00010010,
+    0b00100100,
+    0b01001000,
+    0b01001000,
+];
