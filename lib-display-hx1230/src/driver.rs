@@ -20,8 +20,13 @@ impl<'a, SPI: spi::Write<u8>, CS: OutputPin> Driver<'a, SPI, CS> {
     }
 
     pub fn set_column(&mut self, column: u8) -> MiniResult {
-        self.command(Command::set_column_low(column))?;
-        self.command(Command::set_column_high(column))
+        self.transmit_block(
+            &[
+                Command::set_column_low(column).value(),
+                Command::set_column_high(column).value(),
+            ],
+            true
+        )
     }
 
     pub fn reset_position(&mut self) -> MiniResult {
@@ -41,7 +46,7 @@ impl<'a, SPI: spi::Write<u8>, CS: OutputPin> Driver<'a, SPI, CS> {
 
     #[inline(never)]
     pub fn command(&mut self, command: Command) -> MiniResult {
-        self.transmit(&[command.value()], true)
+        self.transmit_block(&[command.value()], true)
     }
 
     pub fn send_data(&mut self, data: &[u8]) -> MiniResult {
@@ -55,38 +60,49 @@ impl<'a, SPI: spi::Write<u8>, CS: OutputPin> Driver<'a, SPI, CS> {
     /// Write 64 bits of data using 72bits (9 bytes) emitted through SPI
     #[inline(never)]
     fn transmit(&mut self, data: &[u8], is_command: bool) -> MiniResult {
-        let flag = (!is_command) as u8;
         let data_len = data.len();
-
         let max: usize = data_len/8 + (data_len % 8 > 0) as usize;
 
         for block_id in 0..max {
             let block_start = min(block_id*8, data.len());
             let block_end = min(block_id*8+8, data.len());
             let block = &data[block_start..block_end];
-
-            let len = block.len();
-            let mut buffer = [0u8; 9];
-
-            for shift in 0..len {
-                buffer[shift] |= flag << (7 - shift);
-
-                if shift == 7 {
-                    buffer[shift + 1] = block[shift];
-                } else {
-                    buffer[shift] |= block[shift] >> (shift + 1);
-                    buffer[shift + 1] |= block[shift] << (7 - shift);
-                }
-            }
-
-            let output = if len == 8 { &buffer[..] } else { &buffer[0..(len+1)] };
-
-            self.cs.set_low().map_err(|_| ())?;
-            self.spi.write(output).map_err(|_| ())?;
-            self.cs.set_high().map_err(|_| ())?;
+            self.transmit_block(block, is_command)?;
         }
 
         Ok(())
+    }
+
+
+    /// Write 64 bits of data using 72bits (9 bytes) emitted through SPI
+    #[inline(never)]
+    fn transmit_block(&mut self, data: &[u8], is_command: bool) -> MiniResult {
+        let flag = (!is_command) as u8;
+        let block = &data[0..min(data.len(), 8)];
+        let len = block.len();
+        let mut buffer = [0u8; 9];
+
+        for shift in 0..len {
+            buffer[shift] |= flag << (7 - shift);
+
+            if shift == 7 {
+                buffer[shift + 1] = block[shift];
+            } else {
+                buffer[shift] |= block[shift] >> (shift + 1);
+                buffer[shift + 1] |= block[shift] << (7 - shift);
+            }
+        }
+
+        let output = if len == 8 { &buffer[..] } else { &buffer[0..(len+1)] };
+        self.transmit_raw_bytes(output)
+    }
+
+    /// Write 64 bits of data using 72bits (9 bytes) emitted through SPI
+    #[inline(never)]
+    fn transmit_raw_bytes(&mut self, data: &[u8]) -> MiniResult {
+        self.cs.set_low().map_err(|_| ())?;
+        self.spi.write(data).map_err(|_| ())?;
+        self.cs.set_high().map_err(|_| ())
     }
 }
 
