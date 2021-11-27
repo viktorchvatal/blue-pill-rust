@@ -8,5 +8,6 @@ members = [
     "demo-display-hx1230-spi2",
     "lib-common",
     "lib-display-hx1230",
+    "lib-display-buffer",
     "lib-panic-led",
 ]

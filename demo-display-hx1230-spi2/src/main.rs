@@ -3,9 +3,12 @@
 
 use core::panic::PanicInfo;
 
+use embedded_hal::digital::v2::OutputPin;
 use embedded_hal::spi::{Mode, Phase, Polarity};
+use embedded_hal::blocking::spi;
 
 use cortex_m_rt::entry;
+use lib_display_buffer::{ArrayDisplayBuffer, DisplayBuffer, draw};
 use stm32f1xx_hal::delay::Delay;
 use stm32f1xx_hal::{pac, prelude::*, spi::{NoMiso, Spi}};
 
@@ -60,25 +63,31 @@ fn main() -> ! {
     display.init_sequence().check();
     display.clear_data().check();
 
+    let mut frame_buffer: ArrayDisplayBuffer<96, 9> = ArrayDisplayBuffer::new();
+
     loop {
         led.set_high();
-        display.reset_position().check();
-
-        for _index in 0..12*8 {
-            display.send_data(&TRIANGLE).check();
-        }
-
+        draw::clear_pattern(&mut frame_buffer, &TRIANGLE);
+        draw_display_buffer(&mut frame_buffer, &mut display);
         delay.delay_ms(300_u16);
 
         led.set_low();
-
-        display.reset_position().check();
-
-        for _index in 0..12*8 {
-            display.send_data(&WAVE).check();
-        }
-
+        draw::clear_pattern(&mut frame_buffer, &WAVE);
+        draw_display_buffer(&mut frame_buffer, &mut display);
         delay.delay_ms(300_u16);
+    }
+}
+
+fn draw_display_buffer<SPI, CS>(
+    input: &dyn DisplayBuffer,
+    driver: &mut LcdDriver<SPI, CS>,
+) where SPI: spi::Write<u8>, CS: OutputPin {
+    driver.reset_position().check();
+
+    for line_id in 0..input.line_count() {
+        if let Some(ref line) = input.get_line(line_id) {
+            driver.send_data(line).check();
+        }
     }
 }
 
