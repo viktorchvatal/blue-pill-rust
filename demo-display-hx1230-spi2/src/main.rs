@@ -13,7 +13,7 @@ use stm32f1xx_hal::delay::Delay;
 use stm32f1xx_hal::{pac, prelude::*, spi::{NoMiso, Spi}};
 
 use lib_common::ResultExt;
-use lib_display_hx1230::{DriverSpi as LcdDriver, command as lcd_command};
+use lib_display_hx1230::{SpiDriver as LcdDriver, command as lcd_command};
 
 pub const SPI_MODE: Mode = Mode {
     phase: Phase::CaptureOnFirstTransition,

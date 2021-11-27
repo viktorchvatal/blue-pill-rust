@@ -4,4 +4,4 @@
 pub mod command;
 mod driver;
 
-pub use driver::DriverSpi;
+pub use driver::SpiDriver;

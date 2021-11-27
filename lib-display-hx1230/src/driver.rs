@@ -5,12 +5,12 @@ use lib_common::MiniResult;
 
 use crate::command;
 
-pub struct DriverSpi<'a, SPI, CS> {
+pub struct SpiDriver<'a, SPI, CS> {
     spi: &'a mut SPI,
     cs: &'a mut CS,
 }
 
-impl<'a, SPI, CS> DriverSpi<'a, SPI, CS>
+impl<'a, SPI, CS> SpiDriver<'a, SPI, CS>
 where SPI: spi::Write<u8>, CS: OutputPin {
     pub fn new(spi: &'a mut SPI, cs: &'a mut CS) -> Self {
         Self { spi, cs, }
