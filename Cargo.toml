@@ -3,4 +3,8 @@
 members = [
     "demo-blinky-semihosting",
     "demo-blinky-standalone",
+    "demo-panic-led",
+    "demo-hx1230-spi2",
+    "lib-common",
+    "lib-display-hx1230",
 ]

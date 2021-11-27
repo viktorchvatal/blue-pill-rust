@@ -45,6 +45,19 @@ to the computer using USB port. Pins used are as follows:
 
 ![stlink v2 photo](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/intro/stlink-pinout.jpg)
 
+Warning: always check the pin out - there are many cheap ST Link
+debuggers out there and even they look the same, connertor pin signals
+may be absolutely different
+
+![STLink different pinouts](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/intro/stlink-different-pinouts.jpg)
+
+My chosen colors for signals are:
+
+ - green: GND
+ - yellow: SWCLK
+ - orange: SWDIO
+ - red: 3.3V
+
 Open the debugger using STlink v 2
 
 ```
@@ -64,7 +77,9 @@ Warn : UNEXPECTED idcode: 0x2ba01477
 Error: expected 1 of 1: 0x1ba01477
 ```
 
-Edit `/usr/share/openocd/scripts/target/stm32f1x.cfg` and replace
+That means that you got one of those chinese STM32F030C8 clones instead of
+a genuine STM microcontroller. It should still work fine, but you need to edit
+`/usr/share/openocd/scripts/target/stm32f1x.cfg` and replace
 `set _CPUTAPID 0x1ba01477` with `set _CPUTAPID 0x2ba01477`
 
 In case `openocd` prints
@@ -122,7 +137,7 @@ cargo run demo-blinky-semihosting
 ```
 Green LED should start flashing, 1 second ON, 1 second OFF
 
-![stlink v2 photo](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/intro/blinking.gif)
+![Blinking LED](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/intro/blinking.gif)
 
 openocd console should show the following output at the same time:
 
