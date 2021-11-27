@@ -60,14 +60,14 @@ fn on_panic(_info: &PanicInfo) -> ! {
 Panic LED is connected to the PC14 pin and through a 100 ohm resistor to the
 ground
 
-![stlink v2 photo](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/panic-handling/panic-led-schematic.png)
+![Panic led connection schematic](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/panic-handling/panic-led-schematic.png)
 
 A [demo-panic-led](../demo-panic-led/src/main.rs) can be started
 using `cargo run --bin demo-panic-led`
 
 Oh, did our program really panic?
 
-![stlink v2 photo](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/panic-handling/panic-led-on.jpg)
+![Panic LED ON](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/panic-handling/panic-led-on.jpg)
 
 The LED clearly indicates a panic state, but to find out the cause, we need
 to connect the debugger and enable the semihosting panic setup.

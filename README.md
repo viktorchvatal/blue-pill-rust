@@ -20,6 +20,13 @@ Following links contain a lot of useful resources about STM32 platform and Rust
 [Getting started](doc/getting_started.md) - learn how to install
 development tools and flash the first program
 
+## Panic Handling and Panic LED via GPIO
+
+![Panic LED ON](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/panic-handling/panic-led-on.jpg)
+
+[Panic handling and panic LED](doc/panic_handling.md) - handling panics
+using halt, panic LED and semihosting output
+
 ## Other
 
 [Notes](doc/notes.md)

@@ -49,7 +49,7 @@ Warning: always check the pin out - there are many cheap ST Link
 debuggers out there and even they look the same, connertor pin signals
 may be absolutely different
 
-![stlink v2 photo](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/intro/stlink-different-pinouts.jpg)
+![STLink different pinouts](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/intro/stlink-different-pinouts.jpg)
 
 My chosen colors for signals are:
 
@@ -137,7 +137,7 @@ cargo run demo-blinky-semihosting
 ```
 Green LED should start flashing, 1 second ON, 1 second OFF
 
-![stlink v2 photo](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/intro/blinking.gif)
+![Blinking LED](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/intro/blinking.gif)
 
 openocd console should show the following output at the same time:
 
