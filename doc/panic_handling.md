@@ -91,7 +91,7 @@ use cortex_m_semihosting as sh;
 use panic_semihosting as _;
 ```
 
-And disable out blinking LED panic handler
+And disable our LED panic handler
 
 ```rust
 //#[panic_handler]
@@ -141,8 +141,9 @@ panic message
 panicked at 'assertion failed: rvr < (1 << 24)', /home/*/.cargo/git/checkouts/stm32f1xx-hal-bb9d214e810c7b47/e790b27/src/timer.rs:247:9
 ```
 
-Timer could not be initialized, because timer clock is too high to counter
-value for 1 Hz to fit into 16-bit timer.
+Timer could not be initialized, because timer clock is too high for the counter
+to establish 1 Hz frequency (required value does not fit into
+the 16-bit timer/counter).
 
 Now we can fix our program by configuring the `hclk` timer to run at 8 MHz
 

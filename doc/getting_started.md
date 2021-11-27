@@ -46,7 +46,7 @@ to the computer using USB port. Pins used are as follows:
 ![stlink v2 photo](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/intro/stlink-pinout.jpg)
 
 Warning: always check the pin out - there are many cheap ST Link
-debuggers out there and even they look the same, connertor pin signals
+debuggers out there and even if they look the same, connertor pin signals
 may be absolutely different
 
 ![STLink different pinouts](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/intro/stlink-different-pinouts.jpg)
@@ -133,7 +133,7 @@ Running the program - blinking demo with semihosting debug output, but would not
 run without the debugger
 
 ```
-cargo run demo-blinky-semihosting
+cargo run --bin demo-blinky-semihosting
 ```
 Green LED should start flashing, 1 second ON, 1 second OFF
 
@@ -155,7 +155,7 @@ There is also standalone blinking demo that runs without active debug
 session, but does not have any semihosting output
 
 ```
-cargo run demo-blinky-standalone
+cargo run --bin demo-blinky-standalone
 ```
 
 ## Flashing
