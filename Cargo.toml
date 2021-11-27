@@ -5,7 +5,7 @@ members = [
     "demo-blinky-standalone",
     "demo-panic-led",
     "demo-display-tm1637",
-    "demo-hx1230-spi2",
+    "demo-display-hx1230-spi2",
     "lib-common",
     "lib-display-hx1230",
     "lib-panic-led",

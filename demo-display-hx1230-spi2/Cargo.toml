@@ -1,5 +1,5 @@
 [package]
-name = "demo-hx1230-spi2"
+name = "demo-display-hx1230-spi2"
 version = "0.1.0"
 edition = "2021"
 
