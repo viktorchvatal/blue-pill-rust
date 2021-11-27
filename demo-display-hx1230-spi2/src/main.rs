@@ -1,8 +1,7 @@
 #![no_std]
 #![no_main]
 
-use core::panic::PanicInfo;
-
+use display::{init_display, render_display};
 use embedded_hal::digital::v2::OutputPin;
 use embedded_hal::spi::{Mode, Phase, Polarity};
 use embedded_hal::blocking::spi;
@@ -13,7 +12,10 @@ use stm32f1xx_hal::delay::Delay;
 use stm32f1xx_hal::{pac, prelude::*, spi::{NoMiso, Spi}};
 
 use lib_common::ResultExt;
-use lib_display_hx1230::{SpiDriver as LcdDriver, command as lcd_command};
+use lib_display_hx1230::{SpiHx1230Driver, command as lcd_command};
+use lib_panic_led as _;
+
+mod display;
 
 pub const SPI_MODE: Mode = Mode {
     phase: Phase::CaptureOnFirstTransition,
@@ -56,48 +58,21 @@ fn main() -> ! {
     );
 
     let mut delay = Delay::new(cp.SYST, clocks);
-
-    let mut display = LcdDriver::new(&mut spi, &mut display_cs);
-    display.command(lcd_command::reset()).check();
-    delay.delay_us(100_u16);
-    display.init_sequence().check();
-    display.clear_data().check();
-
     let mut frame_buffer: ArrayDisplayBuffer<96, 9> = ArrayDisplayBuffer::new();
+
+    init_display(&mut spi, &mut display_cs, &mut delay).check();
 
     loop {
         led.set_high();
         draw::clear_pattern(&mut frame_buffer, &TRIANGLE);
-        draw_display_buffer(&mut frame_buffer, &mut display);
+        render_display(&mut spi, &mut display_cs, &frame_buffer).check();
         delay.delay_ms(300_u16);
 
         led.set_low();
         draw::clear_pattern(&mut frame_buffer, &WAVE);
-        draw_display_buffer(&mut frame_buffer, &mut display);
+        render_display(&mut spi, &mut display_cs, &frame_buffer).check();
         delay.delay_ms(300_u16);
     }
-}
-
-fn draw_display_buffer<SPI, CS>(
-    input: &dyn DisplayBuffer,
-    driver: &mut LcdDriver<SPI, CS>,
-) where SPI: spi::Write<u8>, CS: OutputPin {
-    driver.reset_position().check();
-
-    for line_id in 0..input.line_count() {
-        if let Some(ref line) = input.get_line(line_id) {
-            driver.send_data(line).check();
-        }
-    }
-}
-
-#[panic_handler]
-fn on_panic(_info: &PanicInfo) -> ! {
-    let dp = unsafe { pac::Peripherals::steal() };
-    let mut gpiob = dp.GPIOB.split();
-    let mut panic_led = gpiob.pb11.into_push_pull_output(&mut gpiob.crh);
-    panic_led.set_high();
-    loop { }
 }
 
 const TRIANGLE: [u8; 8] = [0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3F, 0x7F, 0xFF];

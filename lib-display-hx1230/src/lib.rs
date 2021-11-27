@@ -4,4 +4,4 @@
 pub mod command;
 mod driver;
 
-pub use driver::SpiDriver;
+pub use driver::SpiHx1230Driver;
