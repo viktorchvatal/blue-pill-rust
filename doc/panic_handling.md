@@ -48,8 +48,8 @@ fn on_panic(_info: &PanicInfo) -> ! {
     // No other code is run after this panic handler so there should
     // be no undefined behavior
     let dp = unsafe { pac::Peripherals::steal() };
-    let mut gpiob = dp.GPIOC.split();
-    let mut panic_led = gpiob.pc14.into_push_pull_output(&mut gpiob.crh);
+    let mut gpiob = dp.GPIOB.split();
+    let mut panic_led = gpiob.pb1.into_push_pull_output(&mut gpiob.crl);
     // Turn on the LED
     panic_led.set_high();
     // Infinite loop at the end so we never return
@@ -57,7 +57,7 @@ fn on_panic(_info: &PanicInfo) -> ! {
 }
 ```
 
-Panic LED is connected to the PC14 pin and through a 100 ohm resistor to the
+Panic LED is connected to the PB1 pin and through a 100 ohm resistor to the
 ground
 
 ![Panic led connection schematic](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/panic-handling/panic-led-schematic.png)
