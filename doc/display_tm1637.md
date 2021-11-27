@@ -33,8 +33,12 @@ Signals on open drain output pins seems to be pushed at their limits,
 there seems to be no room to increase the frequency, but the display needs
 just a little of the data, so it is a no issue.
 
+Communication using open drain pins: clk (yellow) and dio (blue).
+
 ![LED Display connected](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/display-tm1637/clock_and_data.png)
 
 I did not have connected any pull up resistors, but there must be some,
 either in the blue pill module or inside the TM1637 display board.
 
+My display module has been purchased here:
+https://www.laskarduino.cz/hodinovy-displej-tm1637--cerveny/
