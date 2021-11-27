@@ -9,7 +9,7 @@ use cortex_m_rt::entry;
 use stm32f1xx_hal::delay::Delay;
 use stm32f1xx_hal::{pac, prelude::*, spi::{NoMiso, Spi}};
 
-use lib_common::MiniResultExt;
+use lib_common::ResultExt;
 use lib_display_hx1230::{Driver as LcdDriver, Command as LcdCommand};
 
 pub const SPI_MODE: Mode = Mode {

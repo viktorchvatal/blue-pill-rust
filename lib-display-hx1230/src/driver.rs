@@ -73,7 +73,6 @@ impl<'a, SPI: spi::Write<u8>, CS: OutputPin> Driver<'a, SPI, CS> {
         Ok(())
     }
 
-
     /// Write 64 bits of data using 72bits (9 bytes) emitted through SPI
     #[inline(never)]
     fn transmit_block(&mut self, data: &[u8], is_command: bool) -> MiniResult {

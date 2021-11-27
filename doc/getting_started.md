@@ -2,11 +2,11 @@
 
 ## Hardware
 
-Development board (a cheap blue pill clone with STM32F030C8)
+Development board (a cheap blue pill clone with STM32F103C8)
 
 ![blue pill photo](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/intro/intro-blue-pill.jpg)
 
-https://www.laskarduino.cz/arm-stm32-stm32f030c8-vyvojova-deska/
+https://www.laskarduino.cz/bluepill-arm-stm32-stm32f103c8-vyvojova-deska/
 
 Programming interface: ST-Link V2
 

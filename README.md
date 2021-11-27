@@ -2,7 +2,7 @@
 
 My personal walk through learning Rust development on STM32 family of microcontrollers, using:
 
- - Blue Pill development board with STM32F030C8 microcontroller as target device
+ - Blue Pill development board with STM32F103C8 microcontroller as target device
  - STLink v2 as a programming and debugging interface
  - Debian 11 bullseye and Visual studio code as development environment
 
@@ -18,7 +18,7 @@ Following links contain a lot of useful resources about STM32 platform and Rust
 [Getting started](doc/getting_started.md) - learn how to install
 development tools and flash the first program
 
-![stlink v2 photo](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/intro/blinking.gif)
+![stlink v2 photo](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/intro/blinking-small.gif)
 
 ## Panic Handling and Panic LED via GPIO
 
@@ -26,6 +26,14 @@ development tools and flash the first program
 using halt, panic LED and semihosting output
 
 ![Panic LED ON](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/panic-handling/panic-led-on-small.jpg)
+
+## Connecting TM1637 LED Display
+
+[Connecting a TM1637 LED display](doc/display_tm1637.md) - connecting a LED
+display driven by TM1637 circuit using `tm1637` create
+
+![LED Display connected](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/display-tm1637/connected-display-small.jpg)
+
 
 ## Other
 

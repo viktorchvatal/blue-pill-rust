@@ -1,0 +1,10 @@
+[package]
+name = "lib-panic-led"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies.stm32f1xx-hal]
+git = "https://github.com/stm32-rs/stm32f1xx-hal.git"
+features = ["rt", "stm32f103", "medium"]
