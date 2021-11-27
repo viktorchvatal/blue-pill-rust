@@ -10,7 +10,7 @@ use stm32f1xx_hal::delay::Delay;
 use stm32f1xx_hal::{pac, prelude::*, spi::{NoMiso, Spi}};
 
 use lib_common::ResultExt;
-use lib_display_hx1230::{Driver as LcdDriver, Command as LcdCommand};
+use lib_display_hx1230::{DriverSpi as LcdDriver, command as lcd_command};
 
 pub const SPI_MODE: Mode = Mode {
     phase: Phase::CaptureOnFirstTransition,
@@ -55,7 +55,7 @@ fn main() -> ! {
     let mut delay = Delay::new(cp.SYST, clocks);
 
     let mut display = LcdDriver::new(&mut spi, &mut display_cs);
-    display.command(LcdCommand::reset()).check();
+    display.command(lcd_command::reset()).check();
     delay.delay_us(100_u16);
     display.init_sequence().check();
     display.clear_data().check();

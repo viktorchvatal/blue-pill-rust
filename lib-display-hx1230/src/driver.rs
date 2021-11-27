@@ -3,14 +3,15 @@ use core::cmp::min;
 use embedded_hal::{blocking::spi, digital::v2::OutputPin};
 use lib_common::MiniResult;
 
-use crate::command::Command;
+use crate::command;
 
-pub struct Driver<'a, SPI, CS> {
+pub struct DriverSpi<'a, SPI, CS> {
     spi: &'a mut SPI,
     cs: &'a mut CS,
 }
 
-impl<'a, SPI: spi::Write<u8>, CS: OutputPin> Driver<'a, SPI, CS> {
+impl<'a, SPI, CS> DriverSpi<'a, SPI, CS>
+where SPI: spi::Write<u8>, CS: OutputPin {
     pub fn new(spi: &'a mut SPI, cs: &'a mut CS) -> Self {
         Self { spi, cs, }
     }
@@ -22,8 +23,8 @@ impl<'a, SPI: spi::Write<u8>, CS: OutputPin> Driver<'a, SPI, CS> {
     pub fn set_column(&mut self, column: u8) -> MiniResult {
         self.transmit_block(
             &[
-                Command::set_column_low(column).value(),
-                Command::set_column_high(column).value(),
+                command::set_column_low(column),
+                command::set_column_high(column),
             ],
             true
         )
@@ -31,7 +32,7 @@ impl<'a, SPI: spi::Write<u8>, CS: OutputPin> Driver<'a, SPI, CS> {
 
     pub fn reset_position(&mut self) -> MiniResult {
         self.set_column(0)?;
-        self.command(Command::set_page(0))
+        self.command(command::set_page(0))
     }
 
     pub fn clear_data(&mut self) -> MiniResult {
@@ -45,8 +46,8 @@ impl<'a, SPI: spi::Write<u8>, CS: OutputPin> Driver<'a, SPI, CS> {
     }
 
     #[inline(never)]
-    pub fn command(&mut self, command: Command) -> MiniResult {
-        self.transmit_block(&[command.value()], true)
+    pub fn command(&mut self, command: u8) -> MiniResult {
+        self.transmit_block(&[command], true)
     }
 
     pub fn send_data(&mut self, data: &[u8]) -> MiniResult {
@@ -73,47 +74,50 @@ impl<'a, SPI: spi::Write<u8>, CS: OutputPin> Driver<'a, SPI, CS> {
         Ok(())
     }
 
-    /// Write 64 bits of data using 72bits (9 bytes) emitted through SPI
+    /// Write a block of data no longer than 64 bits using 72bits (9 bytes)
+    /// emitted through SPI (input data can be shorter, but not longer than
+    /// 8 bytes)
     #[inline(never)]
     fn transmit_block(&mut self, data: &[u8], is_command: bool) -> MiniResult {
         let flag = (!is_command) as u8;
         let block = &data[0..min(data.len(), 8)];
-        let len = block.len();
         let mut buffer = [0u8; 9];
-
-        for shift in 0..len {
-            buffer[shift] |= flag << (7 - shift);
-
-            if shift == 7 {
-                buffer[shift + 1] = block[shift];
-            } else {
-                buffer[shift] |= block[shift] >> (shift + 1);
-                buffer[shift + 1] |= block[shift] << (7 - shift);
-            }
-        }
-
-        let output = if len == 8 { &buffer[..] } else { &buffer[0..(len+1)] };
-        self.transmit_raw_bytes(output)
-    }
-
-    /// Write 64 bits of data using 72bits (9 bytes) emitted through SPI
-    #[inline(never)]
-    fn transmit_raw_bytes(&mut self, data: &[u8]) -> MiniResult {
+        let outuput_length = encode_control_bit(block, &mut buffer, flag);
+        let output = &buffer[0..outuput_length];
         self.cs.set_low().map_err(|_| ())?;
-        self.spi.write(data).map_err(|_| ())?;
+        self.spi.write(output).map_err(|_| ())?;
         self.cs.set_high().map_err(|_| ())
     }
 }
 
+#[inline(never)]
+fn encode_control_bit(data: &[u8], output: &mut [u8; 9], bit: u8) -> usize {
+    let data = &data[0..min(data.len(), 8)];
+    let len = data.len();
+
+    for shift in 0..len {
+        output[shift] |= bit << (7 - shift);
+
+        if shift == 7 {
+            output[shift + 1] = data[shift];
+        } else {
+            output[shift] |= data[shift] >> (shift + 1);
+            output[shift + 1] |= data[shift] << (7 - shift);
+        }
+    }
+
+    if len == 8 { 9 } else { len + 1 }
+}
+
 const INIT_COMMANDS: &[u8] = &[
-    Command::power_on().value(),
-    Command::set_contrast(30).value(),
-    Command::display_test_off().value(),
-    Command::horizontal_flip_off().value(),
-    Command::vertical_flip_off().value(),
-    Command::invert_off().value(),
-    Command::display_on().value(),
-    Command::set_column_low(0).value(),
-    Command::set_column_high(0).value(),
-    Command::set_page(0).value(),
+    command::power_on(),
+    command::set_contrast(30),
+    command::display_test_off(),
+    command::horizontal_flip_off(),
+    command::vertical_flip_off(),
+    command::invert_off(),
+    command::display_on(),
+    command::set_column_low(0),
+    command::set_column_high(0),
+    command::set_page(0),
 ];
