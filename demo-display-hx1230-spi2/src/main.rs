@@ -2,17 +2,14 @@
 #![no_main]
 
 use display::{init_display, render_display};
-use embedded_hal::digital::v2::OutputPin;
 use embedded_hal::spi::{Mode, Phase, Polarity};
-use embedded_hal::blocking::spi;
 
 use cortex_m_rt::entry;
-use lib_display_buffer::{ArrayDisplayBuffer, DisplayBuffer, draw};
+use lib_display_buffer::{ArrayDisplayBuffer, draw};
 use stm32f1xx_hal::delay::Delay;
 use stm32f1xx_hal::{pac, prelude::*, spi::{NoMiso, Spi}};
 
 use lib_common::ResultExt;
-use lib_display_hx1230::{SpiHx1230Driver, command as lcd_command};
 use lib_panic_led as _;
 
 mod display;

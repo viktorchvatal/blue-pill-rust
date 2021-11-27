@@ -1,4 +1,3 @@
-use cortex_m::prelude::_embedded_hal_blocking_delay_DelayUs;
 use embedded_hal::{blocking::spi, digital::v2::OutputPin};
 use embedded_hal::blocking::delay::DelayUs;
 use lib_common::MiniResult;
