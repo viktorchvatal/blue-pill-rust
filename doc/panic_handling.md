@@ -62,7 +62,7 @@ ground
 
 ![Panic led connection schematic](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/panic-handling/panic-led-schematic.png)
 
-A [demo-panic-led](../demo-panic-led/src/main.rs) can be started
+A [demo-panic-led](../demo/demo-panic-led/src/main.rs) can be started
 using `cargo run --bin demo-panic-led`
 
 Oh, did our program really panic?
