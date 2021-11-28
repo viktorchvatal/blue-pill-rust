@@ -27,6 +27,11 @@ using halt, panic LED and semihosting output
 
 ![Panic LED ON](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/panic-handling/panic-led-on-small.jpg)
 
+## PWM Channels and colored LEDS [in progress]
+
+[PWM Channels and colored LEDS](doc/pwm_channels.md) - changing brightness
+of multipe LEDS using PWN channels and `micromath` fast approximation library
+
 ## Connecting TM1637 LED Display
 
 [Connecting a TM1637 LED display](doc/display_tm1637.md) - connecting a LED
@@ -34,6 +39,10 @@ display driven by TM1637 circuit using `tm1637` create
 
 ![LED Display connected](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/display-tm1637/connected-display-small.jpg)
 
+## Interfacing HX1230 Matrix Graphical Display [in progress]
+
+[HX1230 Graphical display demo](doc/display_hx1230.md) - communicating
+with the HX1230 graphical display
 
 ## Other
 

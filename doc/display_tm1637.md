@@ -42,3 +42,7 @@ either in the blue pill module or inside the TM1637 display board.
 
 My display module has been purchased here:
 https://www.laskarduino.cz/hodinovy-displej-tm1637--cerveny/
+
+## Resources
+
+See the `tm1637` create for any details https://github.com/igelbox/tm1637-rs
