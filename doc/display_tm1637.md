@@ -24,7 +24,7 @@ I have used `PB9` and `PB8` to drive the display
 ```
 
 Example code of the `tm1637` crate usage is in the
-[demo-display-tm1637](../demo-display-tm1637/src/main.rs) crate.
+[demo-display-tm1637](../demo/demo-display-tm1637/src/main.rs) crate.
 
 ![LED Display connected](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/display-tm1637/connected-display.jpg)
 
