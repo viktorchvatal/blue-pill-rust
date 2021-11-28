@@ -1,6 +1,7 @@
 #![no_std]
 #![no_main]
 
+use core::cmp;
 use core::f32::consts::FRAC_PI_2;
 
 use cortex_m_rt::entry;
@@ -45,8 +46,8 @@ fn main() -> ! {
 
     let mut phase: f32 = 0.0;
 
-    let max_gy = pwm.get_max_duty() as f32;
-    let max_r = max_gy/4.0; // red is too bright, decrase duty in software
+    let max_gy = pwm.get_max_duty() as f32; // maximal duty for green, yellow
+    let max_r = max_gy/4.0; // red is too bright, decrease duty in software
     let max_b = max_r/4.0; // blue is even brighter, dim it even more
 
     loop {
@@ -64,7 +65,7 @@ fn maxf(a: f32, b: f32) -> f32 {
 }
 
 fn compute_duty(phase: f32, shift: f32, max: f32) -> u16 {
-    (sqr(maxf(0.0, (phase + shift).sin()))*max) as u16
+    cmp::max(1, (sqr(maxf(0.0, (phase + shift).sin()))*max) as u16)
 }
 
 fn sqr(value: f32) -> f32 {
