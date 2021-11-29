@@ -16,10 +16,17 @@ https://github.com/mcauser/micropython-hx1230
  - set of potentiometers: https://www.laskarduino.cz/laskkit-potentiometer-3296w-kit-50ks/
  - https://www.laskarduino.cz/4-kanaly-obousmerny-prevodnik-logickych-urovni-5v-a-3-3v/ https://www.laskarduino.cz/8-kanaly-obousmerny-prevodnik-logickych-urovni-5v-a-3-3v/ level shifting translator
  - UART 3.3V to RS485: https://www.laskarduino.cz/prevodnik-uart-na-rs-485--max485/
+ - LED Matrix display: https://www.laskarduino.cz/32x8-led-matice-s-max7219-3mm/
+ - power source: https://www.laskarduino.cz/sitovy-napajeci-adapter-5v-1a-5-5-2-1mm/
+ - micro sub connector https://www.laskarduino.cz/microusb-na-dip-adapter/
 
  - https://www.tipa.eu/cz/vyvojova-deska-arm-stm32f103c8t6/d-243616/
  - https://www.tipa.eu/cz/redukce-usb-rs485/d-216603/
  - https://www.tipa.eu/cz/modul-lan-ethernet-mini-enc28j60/d-243257/
+ - USB-C cable: https://www.tipa.eu/cz/kabel-allocacoc-usb-usb-c-15m-sedy/d-210182/
 
 ## new things to try
  - EEPROM: https://www.laskarduino.cz/eeprom-modul--at24c02--i2c/
+
+## Servos
+ - https://www.peckamodel.cz/1hi3082-hs-430-bh
