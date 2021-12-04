@@ -3,5 +3,6 @@
 
 pub mod command;
 mod driver;
+mod encode;
 
 pub use driver::SpiHx1230Driver;

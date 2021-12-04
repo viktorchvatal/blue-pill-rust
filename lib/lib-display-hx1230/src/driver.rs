@@ -3,7 +3,7 @@ use core::cmp::min;
 use embedded_hal::{blocking::spi, digital::v2::OutputPin};
 use lib_common::MiniResult;
 
-use crate::command;
+use crate::{command::{set_position}, encode::encode_control_bit};
 
 pub struct SpiHx1230Driver<'a, SPI, CS> {
     spi: &'a mut SPI,
@@ -16,33 +16,10 @@ where SPI: spi::Write<u8>, CS: OutputPin {
         Self { spi, cs, }
     }
 
-    pub fn init_sequence(&mut self) -> MiniResult {
-        self.transmit(INIT_COMMANDS, true)
-    }
-
-    pub fn set_column(&mut self, column: u8) -> MiniResult {
-        self.transmit_block(
-            &[
-                command::set_column_low(column),
-                command::set_column_high(column),
-            ],
-            true
-        )
-    }
-
-    pub fn reset_position(&mut self) -> MiniResult {
-        self.set_column(0)?;
-        self.command(command::set_page(0))
-    }
-
     pub fn clear_data(&mut self) -> MiniResult {
-        self.reset_position()?;
-
-        for _ in 0..12*9 {
-            self.send_data(&[0; 8])?;
-        }
-
-        self.reset_position()
+        self.send_commands(&set_position(0, 0))?;
+        for _ in 0..12*9 { self.send_data(&[0; 8])?; }
+        self.send_commands(&set_position(0, 0))
     }
 
     #[inline(never)]
@@ -50,10 +27,12 @@ where SPI: spi::Write<u8>, CS: OutputPin {
         self.transmit_block(&[command], true)
     }
 
+    #[inline(never)]
     pub fn send_data(&mut self, data: &[u8]) -> MiniResult {
         self.transmit(data, false)
     }
 
+    #[inline(never)]
     pub fn send_commands(&mut self, commands: &[u8]) -> MiniResult {
         self.transmit(commands, true)
     }
@@ -90,34 +69,3 @@ where SPI: spi::Write<u8>, CS: OutputPin {
     }
 }
 
-#[inline(never)]
-fn encode_control_bit(data: &[u8], output: &mut [u8; 9], bit: u8) -> usize {
-    let data = &data[0..min(data.len(), 8)];
-    let len = data.len();
-
-    for shift in 0..len {
-        output[shift] |= bit << (7 - shift);
-
-        if shift == 7 {
-            output[shift + 1] = data[shift];
-        } else {
-            output[shift] |= data[shift] >> (shift + 1);
-            output[shift + 1] |= data[shift] << (7 - shift);
-        }
-    }
-
-    if len == 8 { 9 } else { len + 1 }
-}
-
-const INIT_COMMANDS: &[u8] = &[
-    command::power_on(),
-    command::set_contrast(30),
-    command::display_test_off(),
-    command::horizontal_flip_off(),
-    command::vertical_flip_off(),
-    command::invert_off(),
-    command::display_on(),
-    command::set_column_low(0),
-    command::set_column_high(0),
-    command::set_page(0),
-];

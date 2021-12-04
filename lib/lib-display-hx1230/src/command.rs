@@ -88,3 +88,28 @@ pub const fn set_column_low(column: u8) -> u8 {
 pub const fn set_column_high(column: u8) -> u8 {
     0b00010000 | (column & 0b00000111)
 }
+
+pub const fn init_sequence() -> &'static [u8] {
+    const INIT: &[u8] = &[
+        power_on(),
+        set_contrast(30),
+        display_test_off(),
+        horizontal_flip_off(),
+        vertical_flip_off(),
+        invert_off(),
+        display_on(),
+        set_column_low(0),
+        set_column_high(0),
+        set_page(0),
+    ];
+
+    INIT
+}
+
+pub const fn set_position(column: u8, page: u8) -> [u8; 3] {
+    [
+        set_column_low(column),
+        set_column_high(column),
+        set_page(page),
+    ]
+}
