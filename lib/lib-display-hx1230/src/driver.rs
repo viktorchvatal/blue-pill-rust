@@ -3,7 +3,7 @@ use core::cmp::min;
 use embedded_hal::{blocking::spi, digital::v2::OutputPin};
 use lib_common::MiniResult;
 
-use crate::{command::{set_position}, encode::encode_control_bit};
+use crate::{encode::encode_control_bit, Hx1230Driver};
 
 pub struct SpiHx1230Driver<'a, SPI, CS> {
     spi: &'a mut SPI,
@@ -16,31 +16,15 @@ where SPI: spi::Write<u8>, CS: OutputPin {
         Self { spi, cs, }
     }
 
-    pub fn clear_data(&mut self) -> MiniResult {
-        self.send_commands(&set_position(0, 0))?;
-        for _ in 0..12*9 { self.send_data(&[0; 8])?; }
-        self.send_commands(&set_position(0, 0))
-    }
-
-    #[inline(never)]
-    pub fn command(&mut self, command: u8) -> MiniResult {
-        self.transmit_block(&[command], true)
-    }
-
-    #[inline(never)]
-    pub fn send_data(&mut self, data: &[u8]) -> MiniResult {
-        self.transmit(data, false)
-    }
-
-    #[inline(never)]
-    pub fn send_commands(&mut self, commands: &[u8]) -> MiniResult {
-        self.transmit(commands, true)
-    }
-
     /// Write 64 bits of data using 72bits (9 bytes) emitted through SPI
     #[inline(never)]
     fn transmit(&mut self, data: &[u8], is_command: bool) -> MiniResult {
         let data_len = data.len();
+
+        if data_len == 0 {
+            return Ok(())
+        }
+
         let max: usize = data_len/8 + (data_len % 8 > 0) as usize;
 
         for block_id in 0..max {
@@ -69,3 +53,15 @@ where SPI: spi::Write<u8>, CS: OutputPin {
     }
 }
 
+impl<'a, SPI, CS> Hx1230Driver for SpiHx1230Driver<'a, SPI, CS>
+where SPI: spi::Write<u8>, CS: OutputPin {
+    #[inline(never)]
+    fn send_data(&mut self, data: &[u8]) -> MiniResult {
+        self.transmit(data, false)
+    }
+
+    #[inline(never)]
+    fn send_commands(&mut self, commands: &[u8]) -> MiniResult {
+        self.transmit(commands, true)
+    }
+}

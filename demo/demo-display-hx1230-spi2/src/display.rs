@@ -3,7 +3,7 @@ use embedded_hal::blocking::delay::DelayUs;
 use lib_common::MiniResult;
 use lib_display_buffer::DisplayBuffer;
 use lib_display_hx1230::command::{init_sequence, set_position};
-use lib_display_hx1230::{SpiHx1230Driver, command};
+use lib_display_hx1230::{SpiHx1230Driver, command, Hx1230Driver};
 
 #[inline(never)]
 pub fn init_display<SPI, CS, D>(
