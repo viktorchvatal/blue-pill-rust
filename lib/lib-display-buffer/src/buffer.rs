@@ -1,3 +1,5 @@
+use embedded_graphics_core::{prelude::{DrawTarget, Size, OriginDimensions}, pixelcolor::BinaryColor, Pixel};
+
 /// Display frame buffer, width is in pixels, height is is octets
 pub struct ArrayDisplayBuffer<const W: usize, const H: usize> {
     pixels: [[u8; W]; H]
@@ -37,5 +39,29 @@ impl<const W: usize, const H: usize> DisplayBuffer for ArrayDisplayBuffer<W, H> 
 
     fn line_count(&self) -> usize {
         H
+    }
+}
+
+impl<const W: usize, const H: usize> DrawTarget for ArrayDisplayBuffer<W, H> {
+    type Color = BinaryColor;
+
+    type Error = core::convert::Infallible;
+
+    fn draw_iter<I>(&mut self, pixels: I) -> Result<(), Self::Error>
+    where I: IntoIterator<Item = embedded_graphics_core::Pixel<Self::Color>> {
+        for Pixel(coord, color) in pixels.into_iter() {
+            let line = (coord.y as usize / 8) % H;
+            let column = (coord.x as usize) % W;
+            let shift = (coord.y as usize) % 8;
+            self.pixels[line][column] = self.pixels[line][column] & (!(1 << shift)) | ((color.is_on() as u8) << shift);
+        }
+
+        Ok(())
+    }
+}
+
+impl<const W: usize, const H: usize> OriginDimensions for ArrayDisplayBuffer<W, H> {
+    fn size(&self) -> Size {
+        Size::new(W as u32, (H*8) as u32)
     }
 }

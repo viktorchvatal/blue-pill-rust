@@ -13,6 +13,7 @@ lib-common = { path = "../../lib/lib-common" }
 lib-display-hx1230 = { path = "../../lib/lib-display-hx1230" }
 lib-display-buffer = { path = "../../lib/lib-display-buffer" }
 lib-panic-led = { path = "../../lib/lib-panic-led" }
+embedded-graphics = "0.7.1"
 
 [dependencies.stm32f1xx-hal]
 git = "https://github.com/stm32-rs/stm32f1xx-hal.git"
