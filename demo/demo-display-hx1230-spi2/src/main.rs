@@ -70,7 +70,7 @@ fn main() -> ! {
         draw::clear_pattern(&mut frame_buffer, &[0; 8]);
 
         Circle::new(Point::new(48 - diameter/2, 32 - diameter/2), diameter as u32)
-            .into_styled(PrimitiveStyle::with_stroke(BinaryColor::On, 1))
+            .into_styled(PrimitiveStyle::with_stroke(BinaryColor::On, 3))
             .draw(&mut frame_buffer).check();        
 
         render_display(&mut spi, &mut display_cs, &frame_buffer).check();
@@ -82,16 +82,3 @@ fn main() -> ! {
         delay.delay_ms(30_u16);
     }
 }
-
-const TRIANGLE: [u8; 8] = [0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3F, 0x7F, 0xFF];
-
-const WAVE : [u8; 8] = [
-    0b01001000,
-    0b00100100,
-    0b00010010,
-    0b00010010,
-    0b00010010,
-    0b00100100,
-    0b01001000,
-    0b01001000,
-];
