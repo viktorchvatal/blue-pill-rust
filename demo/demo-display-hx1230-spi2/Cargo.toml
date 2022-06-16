@@ -15,6 +15,10 @@ lib-display-buffer = { path = "../../lib/lib-display-buffer" }
 lib-panic-led = { path = "../../lib/lib-panic-led" }
 embedded-graphics = "0.7.1"
 
+[dependencies.arrayvec]
+version = "0.7.2"
+default-features = false
+
 [dependencies.stm32f1xx-hal]
 version = "0.9.0"
 features = ["rt", "stm32f103", "medium"]

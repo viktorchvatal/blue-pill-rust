@@ -1,4 +1,4 @@
-use embedded_graphics_core::{prelude::{DrawTarget, Size, OriginDimensions}, pixelcolor::BinaryColor, Pixel};
+use embedded_graphics_core::{prelude::*, pixelcolor::BinaryColor, Pixel};
 
 /// Display frame buffer, width is in pixels, height is is octets
 pub struct ArrayDisplayBuffer<const W: usize, const H: usize> {
@@ -10,6 +10,12 @@ pub trait DisplayBuffer {
     fn line_count(&self) -> usize;
     fn get_line(&self, y: usize) -> Option<&[u8]>;
     fn get_line_mut(&mut self, y: usize) -> Option<&mut [u8]>;
+
+    fn line_memset(&mut self, line: usize, data: u8) {
+        if let Some(pixels) = self.get_line_mut(line) {
+            pixels.iter_mut().for_each(|x| *x = data);
+        }
+    }
 }
 
 impl<const W: usize, const H: usize> ArrayDisplayBuffer<W, H> {
@@ -54,10 +60,10 @@ impl<const W: usize, const H: usize> DrawTarget for ArrayDisplayBuffer<W, H> {
                 let line = coord.y as usize / 8;
                 let column = coord.x as usize;
                 let shift = (coord.y as usize) % 8;
-    
-                self.pixels[line][column] = self.pixels[line][column] 
-                    & (!(1 << shift)) 
-                    | ((color.is_on() as u8) << shift);        
+
+                self.pixels[line][column] = self.pixels[line][column]
+                    & (!(1 << shift))
+                    | ((color.is_on() as u8) << shift);
             }
         }
 

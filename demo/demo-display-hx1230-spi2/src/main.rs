@@ -1,15 +1,19 @@
 #![no_std]
 #![no_main]
 
+use core::fmt::Write;
+use arrayvec::ArrayString;
 use display::{init_display, render_display};
 use embedded_graphics::Drawable;
 use embedded_graphics::pixelcolor::BinaryColor;
-use embedded_graphics::prelude::{Primitive, Point};
+use embedded_graphics::prelude::*;
 use embedded_graphics::primitives::{PrimitiveStyle, Circle};
+use embedded_graphics::mono_font::{ascii::FONT_6X13, MonoTextStyle};
+use embedded_graphics::text::Text;
 use embedded_hal::spi::{Mode, Phase, Polarity};
 
 use cortex_m_rt::entry;
-use lib_display_buffer::{ArrayDisplayBuffer, draw};
+use lib_display_buffer::{ArrayDisplayBuffer, draw, DisplayBuffer};
 use stm32f1xx_hal::{pac, prelude::*, spi::{NoMiso, Spi}};
 
 use lib_common::ResultExt;
@@ -63,21 +67,42 @@ fn main() -> ! {
     init_display(&mut spi, &mut display_cs, &mut delay).check();
 
     let mut diameter = 1;
+    let text_style = MonoTextStyle::new(&FONT_6X13, BinaryColor::On);
 
     loop {
         led.set_low();
         draw::clear_pattern(&mut frame_buffer, &[0; 8]);
 
-        Circle::new(Point::new(48 - diameter/2, 32 - diameter/2), diameter as u32)
-            .into_styled(PrimitiveStyle::with_stroke(BinaryColor::On, 3))
-            .draw(&mut frame_buffer).check();
+        draw_circle(48, 40, (diameter + 10) % 80, &mut frame_buffer);
+        draw_circle(20, 20, (diameter +  0) % 60, &mut frame_buffer);
+        draw_circle(60, 20, (diameter + 20) % 60, &mut frame_buffer);
+        draw_circle(80, 50, (diameter + 30) % 60, &mut frame_buffer);
+        draw_circle(20, 60, (diameter + 40) % 60, &mut frame_buffer);
+
+        frame_buffer.line_memset(0, 0);
+        frame_buffer.line_memset(1, 0);
+
+        let mut text = ArrayString::<14>::new();
+        let _ = write!(&mut text, "Bubbles {}", diameter);
+
+        Text::new(&text, Point::new(0, 12), text_style)
+            .draw(&mut frame_buffer)
+            .check();
 
         render_display(&mut spi, &mut display_cs, &frame_buffer).check();
 
-        diameter = (diameter + 2) % 100;
+        diameter = diameter + 1;
 
         led.set_high();
 
-        delay.delay_ms(30_u16);
+        delay.delay_ms(100_u16);
     }
+}
+
+fn draw_circle<D>(x: i32, y: i32, diameter: i32, frame_buffer: &mut D)
+where D: DrawTarget<Color = BinaryColor> {
+    Circle::new(Point::new(x - diameter/2, y - diameter/2), diameter as u32)
+        .into_styled(PrimitiveStyle::with_stroke(BinaryColor::On, 3))
+        .draw(frame_buffer)
+        .check();
 }
