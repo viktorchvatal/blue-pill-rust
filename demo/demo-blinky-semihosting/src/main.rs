@@ -4,7 +4,7 @@
 //!
 //! Note: Without additional hardware, PC13 should not be used to drive an LED, see page 5.1.2 of
 //! the reference manual for an explanation. This is not an issue on the blue pill.
-//! 
+//!
 //! Original source: https://github.com/stm32-rs/stm32f1xx-hal/blob/master/examples/blinky.rs
 
 #![deny(unsafe_code)]
@@ -31,16 +31,16 @@ fn main() -> ! {
     // Take ownership over the raw flash and rcc devices and convert them into the corresponding
     // HAL structs
     let mut flash = dp.FLASH.constrain();
-    
+
     let rcc = dp.RCC.constrain();
 
     // Freeze the configuration of all the clocks in the system and store the frozen frequencies in
     // `clocks`
     let clocks = rcc
         .cfgr
-        .use_hse(8.mhz())  // use external oscillator (8 MHz)
-        .sysclk(72.mhz())  // system clock, PLL multiplier should be 6
-        .hclk(8.mhz())     // clock used for timers   
+        .use_hse(8.MHz())  // use external oscillator (8 MHz)
+        .sysclk(72.MHz())  // system clock, PLL multiplier should be 6
+        .hclk(8.MHz())     // clock used for timers
         .freeze(&mut flash.acr);
 
     // Acquire the GPIOC peripheral
@@ -51,7 +51,9 @@ fn main() -> ! {
     let mut led = gpioc.pc13.into_push_pull_output(&mut gpioc.crh);
 
     // Configure the syst timer to trigger an update every second
-    let mut timer = Timer::syst(cp.SYST, &clocks).start_count_down(1.hz());
+    let mut timer = Timer::syst(cp.SYST, &clocks).counter_hz();
+    timer.start(1.Hz()).unwrap();
+
     let mut hstdout = hio::hstdout().unwrap();
 
     // Wait for the timer to trigger an update and change the state of the LED

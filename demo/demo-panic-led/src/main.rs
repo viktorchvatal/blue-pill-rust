@@ -20,15 +20,16 @@ fn main() -> ! {
     // `clocks`
     let clocks = rcc
         .cfgr
-        .use_hse(8.mhz())  // use external oscillator (8 MHz)
-        .sysclk(72.mhz())  // system clock, PLL multiplier should be 6
+        .use_hse(8.MHz())  // use external oscillator (8 MHz)
+        .sysclk(72.MHz())  // system clock, PLL multiplier should be 6
         .freeze(&mut flash.acr);
 
     let mut gpioc = dp.GPIOC.split();
 
     let mut led = gpioc.pc13.into_push_pull_output(&mut gpioc.crh);
 
-    let mut timer = Timer::syst(cp.SYST, &clocks).start_count_down(1.hz());
+    let mut timer = Timer::syst(cp.SYST, &clocks).counter_hz();
+    timer.start(1.Hz()).unwrap();
 
     // Wait for the timer to trigger an update and change the state of the LED
     loop {

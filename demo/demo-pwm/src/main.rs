@@ -5,8 +5,7 @@ use core::cmp;
 use core::f32::consts::FRAC_PI_2;
 
 use cortex_m_rt::entry;
-use stm32f1xx_hal::pwm::Channel;
-use stm32f1xx_hal::timer::{Tim2NoRemap, Timer};
+use stm32f1xx_hal::timer::{Tim2NoRemap, Channel};
 use stm32f1xx_hal::{pac, prelude::*};
 use lib_panic_led as _;
 use micromath::F32Ext;
@@ -19,9 +18,9 @@ fn main() -> ! {
     let rcc = dp.RCC.constrain();
 
     let clocks = rcc
-        .cfgr.use_hse(8.mhz())  // use external oscillator (8 MHz)
-        .sysclk(72.mhz())  // system clock, PLL multiplier should be 6
-        .hclk(8.mhz())     // clock used for timers
+        .cfgr.use_hse(8.MHz())  // use external oscillator (8 MHz)
+        .sysclk(72.MHz())  // system clock, PLL multiplier should be 6
+        .hclk(8.MHz())     // clock used for timers
         .freeze(&mut flash.acr);
 
     let mut gpioa = dp.GPIOA.split();
@@ -32,9 +31,11 @@ fn main() -> ! {
     let p4 = gpioa.pa3.into_alternate_push_pull(&mut gpioa.crl);
 
     let mut afio = dp.AFIO.constrain();
+    let pins = (p1, p2, p3, p4);
 
-    let mut pwm = Timer::tim2(dp.TIM2, &clocks)
-        .pwm::<Tim2NoRemap, _, _, _>((p1, p2, p3, p4), &mut afio.mapr, 500.hz());
+    let mut pwm = dp
+        .TIM2
+        .pwm_hz::<Tim2NoRemap, _, _>(pins, &mut afio.mapr, 500.Hz(), &clocks);
 
     // Enable clock on each of the channels
     pwm.enable(Channel::C1);
@@ -42,7 +43,7 @@ fn main() -> ! {
     pwm.enable(Channel::C3);
     pwm.enable(Channel::C4);
 
-    pwm.set_period(500.hz());
+    pwm.set_period(500.Hz());
 
     let mut phase: f32 = 0.0;
 

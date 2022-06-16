@@ -8,7 +8,6 @@ use cortex_m_rt::entry;
 use lib_display_hx1230::command::set_position;
 use lib_display_hx1230::{SpiHx1230Driver, Hx1230Driver, command};
 use stm32f1xx_hal::{pac, prelude::*, spi::{NoMiso, Spi}};
-use stm32f1xx_hal::delay::Delay;
 
 use lib_common::ResultExt;
 use lib_panic_led as _;
@@ -28,9 +27,9 @@ fn main() -> ! {
 
     let clocks = rcc
         .cfgr
-        .use_hse(8.mhz())  // use external oscillator (8 MHz)
-        .sysclk(72.mhz())  // system clock, PLL multiplier should be 6
-        .hclk(8.mhz())     // clock used for timers
+        .use_hse(8.MHz())  // use external oscillator (8 MHz)
+        .sysclk(72.MHz())  // system clock, PLL multiplier should be 6
+        .hclk(8.MHz())     // clock used for timers
         .freeze(&mut flash.acr);
 
     let mut gpiob = dp.GPIOB.split();
@@ -47,11 +46,11 @@ fn main() -> ! {
         dp.SPI2,
         (sck, NoMiso, mosi),
         SPI_MODE,
-        4.mhz(),
+        4.MHz(),
         clocks,
     );
 
-    let mut delay = Delay::new(cp.SYST, clocks);
+    let mut delay = cp.SYST.delay(&clocks);
 
     let mut display = SpiHx1230Driver::new(&mut spi, &mut display_cs);
     display.send_commands(&[command::reset()]).check();

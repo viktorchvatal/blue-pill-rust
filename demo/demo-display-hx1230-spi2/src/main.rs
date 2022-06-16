@@ -10,7 +10,6 @@ use embedded_hal::spi::{Mode, Phase, Polarity};
 
 use cortex_m_rt::entry;
 use lib_display_buffer::{ArrayDisplayBuffer, draw};
-use stm32f1xx_hal::delay::Delay;
 use stm32f1xx_hal::{pac, prelude::*, spi::{NoMiso, Spi}};
 
 use lib_common::ResultExt;
@@ -35,9 +34,9 @@ fn main() -> ! {
     // `clocks`
     let clocks = rcc
         .cfgr
-        .use_hse(8.mhz())  // use external oscillator (8 MHz)
-        .sysclk(72.mhz())  // system clock, PLL multiplier should be 6
-        .hclk(8.mhz())     // clock used for timers
+        .use_hse(8.MHz())  // use external oscillator (8 MHz)
+        .sysclk(72.MHz())  // system clock, PLL multiplier should be 6
+        .hclk(8.MHz())     // clock used for timers
         .freeze(&mut flash.acr);
 
     let mut gpiob = dp.GPIOB.split();
@@ -54,11 +53,11 @@ fn main() -> ! {
         dp.SPI2,
         (sck, NoMiso, mosi),
         SPI_MODE,
-        4.mhz(),
+        4.MHz(),
         clocks,
     );
 
-    let mut delay = Delay::new(cp.SYST, clocks);
+    let mut delay = cp.SYST.delay(&clocks);
     let mut frame_buffer: ArrayDisplayBuffer<96, 9> = ArrayDisplayBuffer::new();
 
     init_display(&mut spi, &mut display_cs, &mut delay).check();
@@ -71,7 +70,7 @@ fn main() -> ! {
 
         Circle::new(Point::new(48 - diameter/2, 32 - diameter/2), diameter as u32)
             .into_styled(PrimitiveStyle::with_stroke(BinaryColor::On, 3))
-            .draw(&mut frame_buffer).check();        
+            .draw(&mut frame_buffer).check();
 
         render_display(&mut spi, &mut display_cs, &frame_buffer).check();
 
