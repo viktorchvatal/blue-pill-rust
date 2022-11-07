@@ -5,6 +5,8 @@ use lib_common::MiniResult;
 
 use crate::{Hx1230Driver};
 
+/// Hx1230Driver implementation that uses a chip select CS pin and a SPI
+/// interface to communicate with the display
 pub struct SpiHx1230Driver<'a, SPI, CS> {
     spi: &'a mut SPI,
     cs: &'a mut CS,
