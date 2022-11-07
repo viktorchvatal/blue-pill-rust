@@ -1,23 +1,13 @@
-use crate::command::set_position;
-
 pub trait Hx1230Driver {
-    fn clear_data(&mut self) -> Result<(), ()> {
-        self.send_commands(&set_position(0, 0))?;
+    /// Send data to display
+    fn data(&mut self, data: &[u8]) -> Result<(), ()>;
 
-        for _ in 0..12*9 { 
-            self.send_data(&[0; 8])?; 
-        }
+    /// Send commands to display
+    fn commands(&mut self, commands: &[u8]) -> Result<(), ()>;
 
-        self.send_commands(&set_position(0, 0))
-    }
-
-    #[inline(never)]
+    /// Send a single command
     fn command(&mut self, command: u8) -> Result<(), ()> {
-        self.send_commands(&[command])
+        self.commands(&[command])
     }
-
-    fn send_data(&mut self, data: &[u8]) -> Result<(), ()>;
-
-    fn send_commands(&mut self, commands: &[u8]) -> Result<(), ()>;
 }
 

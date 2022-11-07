@@ -3,7 +3,6 @@
 
 pub mod command;
 mod driver;
-mod encode;
 mod interface;
 
 pub use interface::Hx1230Driver;

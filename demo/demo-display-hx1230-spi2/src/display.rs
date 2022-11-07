@@ -13,10 +13,9 @@ pub fn init_display<SPI, CS, D>(
 ) -> MiniResult
 where SPI: spi::Write<u8>, CS: OutputPin, D: DelayUs<u16> {
     let mut display = SpiHx1230Driver::new(spi, cs);
-    display.send_commands(&[command::reset()])?;
+    display.commands(&[command::reset()])?;
     delay.delay_us(100_u16);
-    display.send_commands(init_sequence())?;
-    display.clear_data()?;
+    display.commands(init_sequence())?;
     Ok(())
 }
 
@@ -28,11 +27,11 @@ pub fn render_display<SPI, CS>(
 ) -> MiniResult
 where SPI: spi::Write<u8>, CS: OutputPin {
     let mut driver = SpiHx1230Driver::new(spi, cs);
-    driver.send_commands(&set_position(0, 0))?;
+    driver.commands(&set_position(0, 0))?;
 
     for line_id in 0..input.line_count() {
         if let Some(ref line) = input.get_line(line_id) {
-            driver.send_data(line)?;
+            driver.data(line)?;
         }
     }
 

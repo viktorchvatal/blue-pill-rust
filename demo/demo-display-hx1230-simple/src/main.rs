@@ -53,16 +53,15 @@ fn main() -> ! {
     let mut delay = cp.SYST.delay(&clocks);
 
     let mut display = SpiHx1230Driver::new(&mut spi, &mut display_cs);
-    display.send_commands(&[command::reset()]).check();
+    display.commands(&[command::reset()]).check();
     delay.delay_us(100_u16);
-    display.send_commands(command::init_sequence()).check();
-    display.clear_data().check();
+    display.commands(command::init_sequence()).check();
 
     let mut phase = 0;
 
     loop {
         led.set_low();
-        display.send_commands(&set_position(0, 0)).check();
+        display.commands(&set_position(0, 0)).check();
 
         for line in 0..9 {
             let shift = if line % 2 == 1 { line + phase } else { line + 8 - phase };
@@ -82,7 +81,7 @@ fn draw_wave_line(phase: usize, display: &mut dyn Hx1230Driver) -> Result<(), ()
         data[index] = WAVE[(index + phase) % WAVE.len()];
     }
 
-    display.send_data(&data)
+    display.data(&data)
 }
 
 const WAVE : [u8; 8] = [

@@ -32,11 +32,11 @@ impl<const W: usize, const H: usize> ArrayDisplayBuffer<W, H> {
 
 impl<const W: usize, const H: usize> DisplayBuffer for ArrayDisplayBuffer<W, H> {
     fn get_line(&self, y: usize) -> Option<&[u8]> {
-        self.pixels.get(y).map(|array| &array[..])
+        self.pixels.get(y).map(|array| array.as_slice())
     }
 
     fn get_line_mut(&mut self, y: usize) -> Option<&mut [u8]> {
-        self.pixels.get_mut(y).map(|array| &mut array[..])
+        self.pixels.get_mut(y).map(|array| array.as_mut_slice())
     }
 
     fn width(&self) -> usize {
