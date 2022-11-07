@@ -5,8 +5,8 @@ use embedded_hal::spi::{Mode, Phase, Polarity};
 use embedded_hal::blocking::{delay::DelayUs};
 
 use cortex_m_rt::entry;
-use lib_display_hx1230::command::set_position;
-use lib_display_hx1230::{SpiHx1230Driver, Hx1230Driver, command};
+use hx1230::command::set_position;
+use hx1230::{SpiDriver, DisplayDriver, command};
 use stm32f1xx_hal::{pac, prelude::*, spi::{NoMiso, Spi}};
 
 use lib_common::ResultExt;
@@ -52,7 +52,7 @@ fn main() -> ! {
 
     let mut delay = cp.SYST.delay(&clocks);
 
-    let mut display = SpiHx1230Driver::new(&mut spi, &mut display_cs);
+    let mut display = SpiDriver::new(&mut spi, &mut display_cs);
     display.commands(&[command::reset()]).check();
     delay.delay_us(100_u16);
     display.commands(command::init_sequence()).check();
@@ -74,7 +74,7 @@ fn main() -> ! {
     }
 }
 
-fn draw_wave_line(phase: usize, display: &mut dyn Hx1230Driver) -> Result<(), ()> {
+fn draw_wave_line(phase: usize, display: &mut dyn DisplayDriver) -> Result<(), ()> {
     let mut data = [0u8; 96];
 
     for index in 0..96 {

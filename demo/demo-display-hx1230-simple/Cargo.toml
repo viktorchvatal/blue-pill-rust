@@ -10,8 +10,12 @@ cortex-m = "0.7"
 cortex-m-rt = "0.7"
 
 lib-common = { path = "../../lib/lib-common" }
-lib-display-hx1230 = { path = "../../lib/lib-display-hx1230" }
 lib-panic-led = { path = "../../lib/lib-panic-led" }
+
+[dependencies.hx1230]
+git = "https://github.com/viktorchvatal/hx1230.git"
+version="0.1.2"
+default-features = false
 
 [dependencies.stm32f1xx-hal]
 version = "0.9.0"

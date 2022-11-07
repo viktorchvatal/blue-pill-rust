@@ -3,7 +3,7 @@
 
 use core::fmt::Write;
 use arrayvec::ArrayString;
-use display::{init_display, render_display};
+use display::{init_display};
 use embedded_graphics::Drawable;
 use embedded_graphics::pixelcolor::BinaryColor;
 use embedded_graphics::prelude::*;
@@ -13,7 +13,7 @@ use embedded_graphics::text::Text;
 use embedded_hal::spi::{Mode, Phase, Polarity};
 
 use cortex_m_rt::entry;
-use lib_display_buffer::{ArrayDisplayBuffer, draw, DisplayBuffer};
+use hx1230::{ArrayDisplayBuffer, DisplayBuffer, SpiDriver, DisplayDriver};
 use stm32f1xx_hal::{pac, prelude::*, spi::{NoMiso, Spi}};
 
 use lib_common::ResultExt;
@@ -62,7 +62,7 @@ fn main() -> ! {
     );
 
     let mut delay = cp.SYST.delay(&clocks);
-    let mut frame_buffer: ArrayDisplayBuffer<96, 9> = ArrayDisplayBuffer::new();
+    let mut frame_buffer: ArrayDisplayBuffer = ArrayDisplayBuffer::new();
 
     init_display(&mut spi, &mut display_cs, &mut delay).check();
 
@@ -71,7 +71,7 @@ fn main() -> ! {
 
     loop {
         led.set_low();
-        draw::clear_pattern(&mut frame_buffer, &[0; 8]);
+        clear(&mut frame_buffer);
 
         draw_circle(48, 40, (diameter + 10) % 80, &mut frame_buffer);
         draw_circle(20, 20, (diameter +  0) % 60, &mut frame_buffer);
@@ -79,8 +79,8 @@ fn main() -> ! {
         draw_circle(80, 50, (diameter + 30) % 60, &mut frame_buffer);
         draw_circle(20, 60, (diameter + 40) % 60, &mut frame_buffer);
 
-        frame_buffer.line_memset(0, 0);
-        frame_buffer.line_memset(1, 0);
+        clear_line(&mut frame_buffer, 0);
+        clear_line(&mut frame_buffer, 1);
 
         let mut text = ArrayString::<14>::new();
         let _ = write!(&mut text, "Bubbles {}", diameter);
@@ -89,7 +89,9 @@ fn main() -> ! {
             .draw(&mut frame_buffer)
             .check();
 
-        render_display(&mut spi, &mut display_cs, &frame_buffer).check();
+
+        let mut driver = SpiDriver::new(&mut spi, &mut display_cs);
+        driver.buffer(&frame_buffer).check();
 
         diameter = diameter + 1;
 
@@ -105,4 +107,16 @@ where D: DrawTarget<Color = BinaryColor> {
         .into_styled(PrimitiveStyle::with_stroke(BinaryColor::On, 3))
         .draw(frame_buffer)
         .check();
+}
+
+fn clear(buffer: &mut ArrayDisplayBuffer) {
+    for y in 0..buffer.line_count() {
+        clear_line(buffer, y);
+    }
+}
+
+fn clear_line(buffer: &mut ArrayDisplayBuffer, y: usize) {
+    if let Some(line) = buffer.get_line_mut(y) {
+        line.iter_mut().for_each(|pixel| *pixel = 0);
+    }
 }
