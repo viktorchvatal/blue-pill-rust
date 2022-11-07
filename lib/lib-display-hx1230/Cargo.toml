@@ -1,9 +1,0 @@
-[package]
-name = "lib-display-hx1230"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-embedded-hal = "0.2.6"
-
-lib-common = { path = "../lib-common" }
