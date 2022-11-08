@@ -12,8 +12,8 @@ pub fn init_display<SPI, CS, D>(
 ) -> MiniResult
 where SPI: spi::Write<u8>, CS: OutputPin, D: DelayUs<u16> {
     let mut display = SpiDriver::new(spi, cs);
-    display.commands(&[command::reset()])?;
+    display.send_commands(&[command::reset()])?;
     delay.delay_us(100_u16);
-    display.commands(init_sequence())?;
+    display.send_commands(init_sequence())?;
     Ok(())
 }

@@ -91,7 +91,7 @@ fn main() -> ! {
 
 
         let mut driver = SpiDriver::new(&mut spi, &mut display_cs);
-        driver.buffer(&frame_buffer).check();
+        driver.send_buffer(&frame_buffer).check();
 
         diameter = diameter + 1;
 
