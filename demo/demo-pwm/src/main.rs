@@ -47,13 +47,15 @@ fn main() -> ! {
 
     let mut phase: f32 = 0.0;
 
-    let max_gy = pwm.get_max_duty() as f32; // maximal duty for green, yellow
-    let max_r = max_gy/4.0; // red is too bright, decrease duty in software
-    let max_b = max_r/4.0; // blue is even brighter, dim it even more
+    let max_duty = pwm.get_max_duty() as f32;
+    let max_g = max_duty;
+    let max_y = max_duty/6.0;
+    let max_r = max_duty;
+    let max_b = max_duty/8.0;
 
     loop {
-        pwm.set_duty(Channel::C1, compute_duty(phase, C1_SHIFT, max_gy));
-        pwm.set_duty(Channel::C2, compute_duty(phase, C2_SHIFT, max_gy));
+        pwm.set_duty(Channel::C1, compute_duty(phase, C1_SHIFT, max_g));
+        pwm.set_duty(Channel::C2, compute_duty(phase, C2_SHIFT, max_y));
         pwm.set_duty(Channel::C3, compute_duty(phase, C3_SHIFT, max_r));
         pwm.set_duty(Channel::C4, compute_duty(phase, C4_SHIFT, max_b));
 
