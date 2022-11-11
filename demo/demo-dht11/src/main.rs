@@ -31,6 +31,7 @@ pub const SPI_MODE: SpiMode = SpiMode {
 fn main() -> ! {
     let mut cp = cortex_m::Peripherals::take().unwrap();
     let dp = pac::Peripherals::take().unwrap();
+    cp.DCB.enable_trace();
     cp.DWT.enable_cycle_counter();
 
     let mut flash = dp.FLASH.constrain();
@@ -69,9 +70,13 @@ fn main() -> ! {
 
     let mut frame_buffer: ArrayDisplayBuffer = ArrayDisplayBuffer::new();
     init_display(&mut spi, &mut display_cs, &mut delay).check();
+    let mut display = SpiDriver::new(&mut spi, &mut display_cs);
     let text_style = MonoTextStyle::new(&FONT_7X13, BinaryColor::On);
     let mut text = ArrayString::<100>::new();
-
+    let _ = write!(&mut text, "Starting up...",);
+    Text::new(&text, Point::new(0, 20), text_style).draw(&mut frame_buffer).check();
+    display.send_buffer(&frame_buffer).check();
+    delay.delay_ms(200_u16);
     let mut dht11 = Dht11::new(thermo_pin);
 
     loop {
@@ -96,12 +101,11 @@ fn main() -> ! {
         }
 
         Text::new(&text, Point::new(0, 20), text_style).draw(&mut frame_buffer).check();
-        let mut driver = SpiDriver::new(&mut spi, &mut display_cs);
-        driver.send_buffer(&frame_buffer).check();
+        display.send_buffer(&frame_buffer).check();
 
         led.set_high();
 
-        delay.delay_ms(1000_u16);
+        delay.delay_ms(500_u16);
     }
 }
 
