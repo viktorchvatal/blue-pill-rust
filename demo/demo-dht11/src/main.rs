@@ -18,7 +18,6 @@ use stm32f1xx_hal::{pac, prelude::*, spi::{NoMiso, Spi}};
 
 use cortex_m_rt::entry;
 
-use lib_common::ResultExt;
 use lib_panic_led as _;
 
 pub const SPI_MODE: SpiMode = SpiMode {
@@ -68,13 +67,13 @@ fn main() -> ! {
     let mut delay = cp.SYST.delay(&clocks);
 
     let mut frame_buffer: ArrayDisplayBuffer = ArrayDisplayBuffer::new();
-    init_display(&mut spi, &mut display_cs, &mut delay).check();
+    init_display(&mut spi, &mut display_cs, &mut delay).unwrap();
     let mut display = SpiDriver::new(&mut spi, &mut display_cs);
     let text_style = MonoTextStyle::new(&FONT_7X13, BinaryColor::On);
     let mut text = ArrayString::<100>::new();
     let _ = write!(&mut text, "Starting up...",);
-    Text::new(&text, Point::new(0, 20), text_style).draw(&mut frame_buffer).check();
-    display.send_buffer(&frame_buffer).check();
+    Text::new(&text, Point::new(0, 20), text_style).draw(&mut frame_buffer).unwrap();
+    display.send_buffer(&frame_buffer).unwrap();
     delay.delay_ms(200_u16);
     let mut dht11 = Dht11::new(thermo_pin);
 
@@ -99,8 +98,8 @@ fn main() -> ! {
             }
         }
 
-        Text::new(&text, Point::new(0, 20), text_style).draw(&mut frame_buffer).check();
-        display.send_buffer(&frame_buffer).check();
+        Text::new(&text, Point::new(0, 20), text_style).draw(&mut frame_buffer).unwrap();
+        display.send_buffer(&frame_buffer).unwrap();
 
         led.set_high();
 

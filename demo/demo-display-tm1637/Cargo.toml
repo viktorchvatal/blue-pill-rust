@@ -9,7 +9,6 @@ nb = "1"
 cortex-m = "0.7"
 cortex-m-rt = "0.7"
 tm1637 = "0.1.0"
-lib-common = { path = "../../lib/lib-common" }
 lib-panic-led = { path = "../../lib/lib-panic-led" }
 
 [dependencies.stm32f1xx-hal]

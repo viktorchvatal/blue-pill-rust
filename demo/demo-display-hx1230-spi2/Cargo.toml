@@ -9,7 +9,6 @@ nb = "1"
 cortex-m = "0.7"
 cortex-m-rt = "0.7"
 
-lib-common = { path = "../../lib/lib-common" }
 lib-panic-led = { path = "../../lib/lib-panic-led" }
 embedded-graphics = "0.7.1"
 hx1230 = "0.3.1"
