@@ -16,7 +16,6 @@ use cortex_m_rt::entry;
 use hx1230::{ArrayDisplayBuffer, DisplayBuffer, SpiDriver, DisplayDriver};
 use stm32f1xx_hal::{pac, prelude::*, spi::{NoMiso, Spi}};
 
-use lib_common::ResultExt;
 use lib_panic_led as _;
 
 mod display;
@@ -64,7 +63,7 @@ fn main() -> ! {
     let mut delay = cp.SYST.delay(&clocks);
     let mut frame_buffer: ArrayDisplayBuffer = ArrayDisplayBuffer::new();
 
-    init_display(&mut spi, &mut display_cs, &mut delay).check();
+    init_display(&mut spi, &mut display_cs, &mut delay).unwrap();
 
     let mut diameter = 1;
     let text_style = MonoTextStyle::new(&FONT_6X13, BinaryColor::On);
@@ -73,11 +72,11 @@ fn main() -> ! {
         led.set_low();
         clear(&mut frame_buffer);
 
-        draw_circle(48, 40, (diameter + 10) % 80, &mut frame_buffer);
-        draw_circle(20, 20, (diameter +  0) % 60, &mut frame_buffer);
-        draw_circle(60, 20, (diameter + 20) % 60, &mut frame_buffer);
-        draw_circle(80, 50, (diameter + 30) % 60, &mut frame_buffer);
-        draw_circle(20, 60, (diameter + 40) % 60, &mut frame_buffer);
+        draw_circle(48, 40, (diameter + 10) % 80, &mut frame_buffer).unwrap();
+        draw_circle(20, 20, (diameter +  0) % 60, &mut frame_buffer).unwrap();
+        draw_circle(60, 20, (diameter + 20) % 60, &mut frame_buffer).unwrap();
+        draw_circle(80, 50, (diameter + 30) % 60, &mut frame_buffer).unwrap();
+        draw_circle(20, 60, (diameter + 40) % 60, &mut frame_buffer).unwrap();
 
         clear_line(&mut frame_buffer, 0);
         clear_line(&mut frame_buffer, 1);
@@ -87,11 +86,10 @@ fn main() -> ! {
 
         Text::new(&text, Point::new(0, 12), text_style)
             .draw(&mut frame_buffer)
-            .check();
-
+            .unwrap();
 
         let mut driver = SpiDriver::new(&mut spi, &mut display_cs);
-        driver.send_buffer(&frame_buffer).check();
+        driver.send_buffer(&frame_buffer).unwrap();
 
         diameter = diameter + 1;
 
@@ -101,12 +99,12 @@ fn main() -> ! {
     }
 }
 
-fn draw_circle<D>(x: i32, y: i32, diameter: i32, frame_buffer: &mut D)
+fn draw_circle<D>(x: i32, y: i32, diameter: i32, frame_buffer: &mut D) -> Result<(), ()>
 where D: DrawTarget<Color = BinaryColor> {
     Circle::new(Point::new(x - diameter/2, y - diameter/2), diameter as u32)
         .into_styled(PrimitiveStyle::with_stroke(BinaryColor::On, 3))
         .draw(frame_buffer)
-        .check();
+        .map_err(|_| ())
 }
 
 fn clear(buffer: &mut ArrayDisplayBuffer) {

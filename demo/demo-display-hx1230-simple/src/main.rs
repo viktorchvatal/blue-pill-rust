@@ -9,7 +9,6 @@ use hx1230::command::set_position;
 use hx1230::{SpiDriver, DisplayDriver, command};
 use stm32f1xx_hal::{pac, prelude::*, spi::{NoMiso, Spi}};
 
-use lib_common::ResultExt;
 use lib_panic_led as _;
 
 pub const SPI_MODE: Mode = Mode {
@@ -53,19 +52,19 @@ fn main() -> ! {
     let mut delay = cp.SYST.delay(&clocks);
 
     let mut display = SpiDriver::new(&mut spi, &mut display_cs);
-    display.commands(&[command::reset()]).check();
+    display.commands(&[command::reset()]).unwrap();
     delay.delay_us(100_u16);
-    display.commands(command::init_sequence()).check();
+    display.commands(command::init_sequence()).unwrap();
 
     let mut phase = 0;
 
     loop {
         led.set_low();
-        display.commands(&set_position(0, 0)).check();
+        display.commands(&set_position(0, 0)).unwrap();
 
         for line in 0..9 {
             let shift = if line % 2 == 1 { line + phase } else { line + 8 - phase };
-            draw_wave_line(shift, &mut display).check();
+            draw_wave_line(shift, &mut display).unwrap();
         }
 
         led.set_high();

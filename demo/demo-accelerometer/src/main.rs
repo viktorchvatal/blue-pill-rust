@@ -147,8 +147,6 @@ fn main() -> ! {
 
         delay.delay_ms(100_u16);
     }
-
-    loop {}
 }
 
 #[inline(never)]

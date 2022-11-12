@@ -4,7 +4,6 @@
 use cortex_m_rt::entry;
 use stm32f1xx_hal::{pac, prelude::*};
 use tm1637::{ TM1637 };
-use lib_common::ResultExt;
 use lib_panic_led as _;
 
 #[entry]
@@ -34,9 +33,9 @@ fn main() -> ! {
 
     {
         let mut display = TM1637::new(&mut clk, &mut dio, &mut delay);
-        display.init().check();
-        display.clear().check();
-        display.set_brightness(7).check();
+        display.init().unwrap();
+        display.clear().unwrap();
+        display.set_brightness(7).unwrap();
     }
 
     let mut index: u16 = 0;
@@ -44,7 +43,7 @@ fn main() -> ! {
     loop {
         {
             let mut display = TM1637::new(&mut clk, &mut dio, &mut delay);
-            display.print_hex(0, &decimal_to_digits(index)).check();
+            display.print_hex(0, &decimal_to_digits(index)).unwrap();
         }
 
         delay.delay_ms(10_u16);
