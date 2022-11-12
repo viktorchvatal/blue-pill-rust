@@ -11,7 +11,6 @@ use embedded_graphics::text::Text;
 use embedded_hal::spi::{Mode as SpiMode, Phase, Polarity};
 use embedded_hal::{blocking::spi, digital::v2::OutputPin};
 use embedded_hal::blocking::delay::DelayUs;
-use lib_common::MiniResult;
 use hx1230::command::{init_sequence};
 use hx1230::{ArrayDisplayBuffer, DisplayBuffer, SpiDriver, command, DisplayDriver};
 
@@ -20,7 +19,6 @@ use stm32f1xx_hal::i2c::{BlockingI2c, Mode as I2CMode, DutyCycle};
 use stm32f1xx_hal::{pac, prelude::*, spi::{NoMiso, Spi}};
 use mpu6050::*;
 
-use lib_common::ResultExt;
 use lib_panic_led as _;
 
 pub const SPI_MODE: SpiMode = SpiMode {
@@ -87,7 +85,7 @@ fn main() -> ! {
 
     let mut frame_buffer: ArrayDisplayBuffer = ArrayDisplayBuffer::new();
 
-    init_display(&mut spi, &mut display_cs, &mut delay).check();
+    init_display(&mut spi, &mut display_cs, &mut delay).unwrap();
 
     let mut diameter = 1;
     let text_style = MonoTextStyle::new(&FONT_5X7, BinaryColor::On);
@@ -96,17 +94,17 @@ fn main() -> ! {
     let mut text = ArrayString::<32>::new();
 
     let _ = write!(&mut text, "Start");
-    Text::new(&text, Point::new(0, 5), text_style).draw(&mut frame_buffer).check();
+    Text::new(&text, Point::new(0, 5), text_style).draw(&mut frame_buffer).unwrap();
     let mut driver = SpiDriver::new(&mut spi, &mut display_cs);
-    driver.send_buffer(&frame_buffer).check();
+    driver.send_buffer(&frame_buffer).unwrap();
 
     if let Err(err) = mpu.init(&mut delay) {
         clear(&mut frame_buffer);
         text.clear();
         let _ = write!(&mut text, "ERROR:\n{:?}", err);
-        Text::new(&text, Point::new(0, 5), text_style).draw(&mut frame_buffer).check();
+        Text::new(&text, Point::new(0, 5), text_style).draw(&mut frame_buffer).unwrap();
         let mut driver = SpiDriver::new(&mut spi, &mut display_cs);
-        driver.send_buffer(&frame_buffer).check();
+        driver.send_buffer(&frame_buffer).unwrap();
         loop {}
     }
 
@@ -124,22 +122,22 @@ fn main() -> ! {
 
         text.clear();
         let _ = write!(&mut text, "ANG {:?}", angles);
-        Text::new(&text, Point::new(0, 5), text_style).draw(&mut frame_buffer).check();
+        Text::new(&text, Point::new(0, 5), text_style).draw(&mut frame_buffer).unwrap();
 
         text.clear();
         let _ = write!(&mut text, "T {:?}", temp);
-        Text::new(&text, Point::new(0, 12), text_style).draw(&mut frame_buffer).check();
+        Text::new(&text, Point::new(0, 12), text_style).draw(&mut frame_buffer).unwrap();
 
         text.clear();
         let _ = write!(&mut text, "G {:?}", gyro);
-        Text::new(&text, Point::new(0, 19), text_style).draw(&mut frame_buffer).check();
+        Text::new(&text, Point::new(0, 19), text_style).draw(&mut frame_buffer).unwrap();
 
         text.clear();
         let _ = write!(&mut text, "ACC {:?}", acc);
-        Text::new(&text, Point::new(0, 26), text_style).draw(&mut frame_buffer).check();
+        Text::new(&text, Point::new(0, 26), text_style).draw(&mut frame_buffer).unwrap();
 
         let mut driver = SpiDriver::new(&mut spi, &mut display_cs);
-        driver.send_buffer(&frame_buffer).check();
+        driver.send_buffer(&frame_buffer).unwrap();
 
         diameter = diameter + 1;
 
@@ -154,7 +152,7 @@ pub fn init_display<SPI, CS, D>(
     spi: &mut SPI,
     cs: &mut CS,
     delay: &mut D,
-) -> MiniResult
+) -> Result<(), ()>
 where SPI: spi::Write<u8>, CS: OutputPin, D: DelayUs<u16> {
     let mut display = SpiDriver::new(spi, cs);
     display.send_commands(&[command::reset()])?;
