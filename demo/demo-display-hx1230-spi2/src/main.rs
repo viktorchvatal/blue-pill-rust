@@ -3,22 +3,20 @@
 
 use core::fmt::Write;
 use arrayvec::ArrayString;
-use display::{init_display};
-use embedded_graphics::Drawable;
-use embedded_graphics::pixelcolor::BinaryColor;
-use embedded_graphics::prelude::*;
-use embedded_graphics::primitives::{PrimitiveStyle, Circle};
-use embedded_graphics::mono_font::{ascii::FONT_6X13, MonoTextStyle};
-use embedded_graphics::text::Text;
-use embedded_hal::spi::{Mode, Phase, Polarity};
-
 use cortex_m_rt::entry;
-use hx1230::{ArrayDisplayBuffer, DisplayBuffer, SpiDriver, DisplayDriver};
+use hx1230::{ArrayDisplayBuffer, DisplayBuffer, SpiDriver, DisplayDriver, command};
 use stm32f1xx_hal::{pac, prelude::*, spi::{NoMiso, Spi}};
-
 use lib_panic_led as _;
-
-mod display;
+use embedded_graphics::{
+    prelude::*, Drawable, pixelcolor::BinaryColor, text::Text,
+    primitives::{PrimitiveStyle, Circle},
+    mono_font::{ascii::FONT_6X13, MonoTextStyle},
+};
+use embedded_hal::{
+    spi::{Mode, Phase, Polarity},
+    blocking::{spi, delay::DelayUs},
+    digital::v2::OutputPin
+};
 
 pub const SPI_MODE: Mode = Mode {
     phase: Phase::CaptureOnFirstTransition,
@@ -52,13 +50,7 @@ fn main() -> ! {
     let sck = gpiob.pb13.into_alternate_push_pull(&mut gpiob.crh);
     let mosi = gpiob.pb15.into_alternate_push_pull(&mut gpiob.crh);
 
-    let mut spi = Spi::spi2(
-        dp.SPI2,
-        (sck, NoMiso, mosi),
-        SPI_MODE,
-        4.MHz(),
-        clocks,
-    );
+    let mut spi = Spi::spi2(dp.SPI2, (sck, NoMiso, mosi), SPI_MODE, 4.MHz(), clocks);
 
     let mut delay = cp.SYST.delay(&clocks);
     let mut frame_buffer: ArrayDisplayBuffer = ArrayDisplayBuffer::new();
@@ -117,4 +109,17 @@ fn clear_line(buffer: &mut ArrayDisplayBuffer, y: usize) {
     if let Some(line) = buffer.get_line_mut(y) {
         line.iter_mut().for_each(|pixel| *pixel = 0);
     }
+}
+
+fn init_display<SPI, CS, D>(
+    spi: &mut SPI,
+    cs: &mut CS,
+    delay: &mut D,
+) -> Result<(), ()>
+where SPI: spi::Write<u8>, CS: OutputPin, D: DelayUs<u16> {
+    let mut display = SpiDriver::new(spi, cs);
+    display.send_commands(&[command::reset()])?;
+    delay.delay_us(100_u16);
+    display.send_commands(command::init_sequence())?;
+    Ok(())
 }
