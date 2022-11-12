@@ -4,7 +4,7 @@
 use core::fmt::Write;
 use arrayvec::ArrayString;
 use cortex_m_rt::entry;
-use hx1230::{ArrayDisplayBuffer, DisplayBuffer, SpiDriver, DisplayDriver, command};
+use hx1230::{ArrayDisplayBuffer, DisplayBuffer, SpiDriver, DisplayDriver};
 use stm32f1xx_hal::{pac, prelude::*, spi::{NoMiso, Spi}};
 use lib_panic_led as _;
 use embedded_graphics::{
@@ -14,8 +14,6 @@ use embedded_graphics::{
 };
 use embedded_hal::{
     spi::{Mode, Phase, Polarity},
-    blocking::{spi, delay::DelayUs},
-    digital::v2::OutputPin
 };
 
 pub const SPI_MODE: Mode = Mode {
@@ -55,14 +53,15 @@ fn main() -> ! {
     let mut delay = cp.SYST.delay(&clocks);
     let mut frame_buffer: ArrayDisplayBuffer = ArrayDisplayBuffer::new();
 
-    init_display(&mut spi, &mut display_cs, &mut delay).unwrap();
+    let mut display = SpiDriver::new(&mut spi, &mut display_cs);
+    display.initialize(&mut delay).unwrap();
 
     let mut diameter = 1;
     let text_style = MonoTextStyle::new(&FONT_6X13, BinaryColor::On);
 
     loop {
         led.set_low();
-        clear(&mut frame_buffer);
+        frame_buffer.clear_buffer(0x00);
 
         draw_circle(48, 40, (diameter + 10) % 80, &mut frame_buffer).unwrap();
         draw_circle(20, 20, (diameter +  0) % 60, &mut frame_buffer).unwrap();
@@ -70,8 +69,8 @@ fn main() -> ! {
         draw_circle(80, 50, (diameter + 30) % 60, &mut frame_buffer).unwrap();
         draw_circle(20, 60, (diameter + 40) % 60, &mut frame_buffer).unwrap();
 
-        clear_line(&mut frame_buffer, 0);
-        clear_line(&mut frame_buffer, 1);
+        frame_buffer.clear_line(0, 0x00);
+        frame_buffer.clear_line(1, 0x00);
 
         let mut text = ArrayString::<14>::new();
         let _ = write!(&mut text, "Bubbles {}", diameter);
@@ -97,29 +96,4 @@ where D: DrawTarget<Color = BinaryColor> {
         .into_styled(PrimitiveStyle::with_stroke(BinaryColor::On, 3))
         .draw(frame_buffer)
         .map_err(|_| ())
-}
-
-fn clear(buffer: &mut ArrayDisplayBuffer) {
-    for y in 0..buffer.line_count() {
-        clear_line(buffer, y);
-    }
-}
-
-fn clear_line(buffer: &mut ArrayDisplayBuffer, y: usize) {
-    if let Some(line) = buffer.get_line_mut(y) {
-        line.iter_mut().for_each(|pixel| *pixel = 0);
-    }
-}
-
-fn init_display<SPI, CS, D>(
-    spi: &mut SPI,
-    cs: &mut CS,
-    delay: &mut D,
-) -> Result<(), ()>
-where SPI: spi::Write<u8>, CS: OutputPin, D: DelayUs<u16> {
-    let mut display = SpiDriver::new(spi, cs);
-    display.send_commands(&[command::reset()])?;
-    delay.delay_us(100_u16);
-    display.send_commands(command::init_sequence())?;
-    Ok(())
 }

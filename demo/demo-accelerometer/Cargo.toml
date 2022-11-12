@@ -12,7 +12,7 @@ cortex-m-rt = "0.7"
 panic-halt = "0.2.0"
 lib-panic-led = { path = "../../lib/lib-panic-led" }
 embedded-graphics = "0.7.1"
-hx1230 = "0.3.1"
+hx1230 = "0.3.2"
 mpu6050 = "0.1.6"
 panic-semihosting = "0.6"
 
