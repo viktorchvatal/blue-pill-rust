@@ -30,7 +30,9 @@ using halt, panic LED and semihosting output
 ## PWM Channels and colored LEDS [in progress]
 
 [PWM Channels and colored LEDS](doc/pwm_channels.md) - changing brightness
-of multipe LEDS using PWN channels and `micromath` fast approximation library
+of multipe LEDS using PWM channels and `micromath` fast approximation library
+
+![PWM LEDs](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/pwm-channels/pwm-leds-small.gif)
 
 ## Connecting TM1637 LED Display
 

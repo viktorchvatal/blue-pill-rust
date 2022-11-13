@@ -1,5 +1,7 @@
 # LED display with TM1637 Driver
 
+Example code: [demo-display-tm1637/src/main.rs](../demo/demo-display-tm1637/src/main.rs)
+
 OK, during the first attempt, i tried to write interfacing code myself,
 but communication needed to change data Pin state between push-pull mode
 and input mode, and i did not find a way to write a generic routine
