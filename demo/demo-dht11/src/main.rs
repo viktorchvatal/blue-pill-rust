@@ -3,17 +3,14 @@
 
 use core::fmt::Write;
 use arrayvec::ArrayString;
-use dht11::Dht11;
+use dht11::{Dht11, Measurement};
 use embedded_graphics::Drawable;
 use embedded_graphics::pixelcolor::BinaryColor;
 use embedded_graphics::prelude::*;
-use embedded_graphics::mono_font::{ascii::FONT_7X13, MonoTextStyle};
+use embedded_graphics::mono_font::{ascii::FONT_7X13, ascii::FONT_7X13_BOLD, MonoTextStyle};
 use embedded_graphics::text::Text;
 use embedded_hal::spi::{Mode as SpiMode, Phase, Polarity};
-use embedded_hal::{blocking::spi, digital::v2::OutputPin};
-use embedded_hal::blocking::delay::DelayUs;
-use hx1230::command::{init_sequence};
-use hx1230::{ArrayDisplayBuffer, DisplayBuffer, SpiDriver, command, DisplayDriver};
+use hx1230::{ArrayDisplayBuffer, DisplayBuffer, SpiDriver, DisplayDriver};
 use stm32f1xx_hal::{pac, prelude::*, spi::{NoMiso, Spi}};
 
 use cortex_m_rt::entry;
@@ -67,38 +64,29 @@ fn main() -> ! {
     let mut delay = cp.SYST.delay(&clocks);
 
     let mut frame_buffer: ArrayDisplayBuffer = ArrayDisplayBuffer::new();
-    init_display(&mut spi, &mut display_cs, &mut delay).unwrap();
     let mut display = SpiDriver::new(&mut spi, &mut display_cs);
-    let text_style = MonoTextStyle::new(&FONT_7X13, BinaryColor::On);
-    let mut text = ArrayString::<100>::new();
-    let _ = write!(&mut text, "Starting up...",);
-    Text::new(&text, Point::new(0, 20), text_style).draw(&mut frame_buffer).unwrap();
+    display.initialize(&mut delay).unwrap();
+    print_text(&mut frame_buffer, "Starting up...").unwrap();
     display.send_buffer(&frame_buffer).unwrap();
     delay.delay_ms(200_u16);
+
     let mut dht11 = Dht11::new(thermo_pin);
 
     loop {
         led.set_low();
-        clear(&mut frame_buffer);
-
-        clear_line(&mut frame_buffer, 0);
-        clear_line(&mut frame_buffer, 1);
+        frame_buffer.clear_buffer(0x00);
 
         let measurement = dht11.perform_measurement(&mut delay);
-        text.clear();
 
         match measurement {
-            Err(err) => { let _ = write!(&mut text, "E:{:?}", err);},
-            Ok(values) => {
-                let _ = write!(
-                    &mut text, "Temperature:\n{}.{} C\nHumidity:\n{}.{} %",
-                    values.temperature/10, values.temperature%10,
-                    values.humidity/10, values.humidity%10,
-                );
-            }
+            Err(err) => {
+                let mut text = ArrayString::<40>::new();
+                let _ = write!(&mut text, "E:{:?}", err);
+                print_text(&mut frame_buffer, &text).unwrap();
+            },
+            Ok(values) => print_measurement(&mut frame_buffer, values).unwrap(),
         }
 
-        Text::new(&text, Point::new(0, 20), text_style).draw(&mut frame_buffer).unwrap();
         display.send_buffer(&frame_buffer).unwrap();
 
         led.set_high();
@@ -107,28 +95,33 @@ fn main() -> ! {
     }
 }
 
-#[inline(never)]
-pub fn init_display<SPI, CS, D>(
-    spi: &mut SPI,
-    cs: &mut CS,
-    delay: &mut D,
-) -> Result<(), ()>
-where SPI: spi::Write<u8>, CS: OutputPin, D: DelayUs<u16> {
-    let mut display = SpiDriver::new(spi, cs);
-    display.send_commands(&[command::reset()])?;
-    delay.delay_us(100_u16);
-    display.send_commands(init_sequence())?;
+const TEMPERATURE: &str = "Temperature:";
+const HUMIDITY: &str = "Humidity:";
+
+fn print_text(
+    frame_buffer: &mut ArrayDisplayBuffer,
+    message: &str,
+) -> Result<(), ()> {
+    let regular = MonoTextStyle::new(&FONT_7X13, BinaryColor::On);
+    Text::new(&message, Point::new(0, 20), regular).draw(frame_buffer).map_err(|_| ())?;
     Ok(())
 }
 
-fn clear(buffer: &mut ArrayDisplayBuffer) {
-    for y in 0..buffer.line_count() {
-        clear_line(buffer, y);
-    }
-}
+fn print_measurement(
+    frame_buffer: &mut ArrayDisplayBuffer,
+    values: Measurement,
+) -> Result<(), ()> {
+    let mut text = ArrayString::<20>::new();
+    let regular = MonoTextStyle::new(&FONT_7X13, BinaryColor::On);
+    let bold = MonoTextStyle::new(&FONT_7X13_BOLD, BinaryColor::On);
 
-fn clear_line(buffer: &mut ArrayDisplayBuffer, y: usize) {
-    if let Some(line) = buffer.get_line_mut(y) {
-        line.iter_mut().for_each(|pixel| *pixel = 0);
-    }
+    Text::new(&TEMPERATURE, Point::new(0, 15), regular).draw(frame_buffer).map_err(|_| ())?;
+    write!(&mut text, "{}.{} C", values.temperature/10, values.temperature%10).map_err(|_| ())?;
+    Text::new(&text, Point::new(0, 30), bold).draw(frame_buffer).map_err(|_| ())?;
+    Text::new(&HUMIDITY, Point::new(0, 45), regular).draw(frame_buffer).map_err(|_| ())?;
+    text.clear();
+    write!(&mut text, "{}.{} %", values.humidity/10, values.humidity%10).map_err(|_| ())?;
+    Text::new(&text, Point::new(0, 60), bold).draw(frame_buffer).map_err(|_| ())?;
+
+    Ok(())
 }
