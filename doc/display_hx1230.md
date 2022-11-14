@@ -1,9 +1,6 @@
 # Interfacing HX1230 Graphical Display
 
-TODO: This is still a work in progress as library for HX1230 is still not
-near stable
+Working example: [demo-display-hx1230](../demo/demo-display-hx1230/src/main.rs)
 
-Demo using blocking SPI insterface:
-[demo-display-hx1230-spi2](../demo/demo-display-hx1230-spi2/src/main.rs)
+![HX1230 Display](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/display-hx1230/hx1230.gif)
 
-TODO: Send data thrugh SPI using DMA channel

@@ -45,6 +45,7 @@ display driven by TM1637 circuit using `tm1637` create
 
 [HX1230 Graphical display demo](doc/display_hx1230.md) - communicating
 with the HX1230 graphical display
+![HX1230 Display](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/display-hx1230/hx1230-small.gif)
 
 ## Interfacing DHT11 Temperature and humidity sensor [in progress]
 
