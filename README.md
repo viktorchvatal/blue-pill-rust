@@ -50,7 +50,8 @@ with the HX1230 graphical display
 
 ## Interfacing DHT11 Temperature and humidity sensor [in progress]
 
-TODO
+[DHT11 Temperature and humidity sensor demo](doc/temperature-dht11.md) - communicating
+with the HX1230 graphical display
 
 ![HX1230 Display](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/temperature-dht11/dht11-small.jpg)
 
