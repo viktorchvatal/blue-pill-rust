@@ -52,6 +52,8 @@ with the HX1230 graphical display
 
 TODO
 
+![HX1230 Display](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/temperature-dht11/dht11-small.jpg)
+
 ## Other
 
 [Notes](doc/notes.md)
