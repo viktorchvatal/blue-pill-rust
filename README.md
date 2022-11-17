@@ -37,7 +37,7 @@ of multipe LEDS using PWM channels and `micromath` fast approximation library
 ## Connecting TM1637 LED Display
 
 [Connecting a TM1637 LED display](doc/display_tm1637.md) - connecting a LED
-display driven by TM1637 circuit using `tm1637` create
+display driven by TM1637 circuit using `tm1637` crate
 
 ![LED Display connected](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/display-tm1637/connected-display-small.jpg)
 

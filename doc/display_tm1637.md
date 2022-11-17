@@ -10,7 +10,7 @@ doing this.
 There is either `Pin<Dynamic>` in the `stm32f1xx-hal` that is difficult
 to be consumed as generic parameter of a function, and `IoPin` from
 the `embedded_hal` crate does not seem to be provided by used
-`stm32f1xx-hal` create.
+`stm32f1xx-hal` crate.
 
 In the end i realized that there already is a perfect `tm1637` crate
 providing easy to use driver that worked perfectly on the first attempt.
@@ -44,6 +44,15 @@ either in the blue pill module or inside the TM1637 display board.
 
 My display module has been purchased here:
 https://www.laskarduino.cz/hodinovy-displej-tm1637--cerveny/
+
+## Connection
+
+| MCU Board   |     Other     | TM1367 Board |
+| ----------- |               | ------------ |
+| PB9         |               | CLK          |
+| PB8         |               | DIO          |
+| -           |    VCC        | VCC          |
+| -           |    GND        | GND          |
 
 ## Resources
 
