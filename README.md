@@ -4,7 +4,41 @@ My personal walk through learning Rust development on STM32 family of microcontr
 
  - Blue Pill development board with STM32F103C8 microcontroller as target device
  - STLink v2 as a programming and debugging interface
- - Debian 11 bullseye and Visual studio code as development environment
+ - Debian 10/11 bullseye and Visual studio code as development environment
+
+## Motivation
+
+After years spent with hobby project build using Atmel AVR Tiny and Mega
+microcontrollers using AVR assembler od C programming environments, I wanted
+to enter the world of ARM microcontroller development. 32-bit ARM devices usually
+provide better CPU performance (compared to 8-bit AVD devices) as well as order
+of magnitude of RAM and Flash capacity, but for similar price. As a Rust
+developer, I wanted a brand with good Rust community support.
+
+I did not want to buy pricey large and well equipped development boards,
+but as a hobbyist I wanted to find a small breadboard-friendly development
+board that could be used in both the prototype and the final device itself.
+
+As of 2019, best fit was the $5 Blue Pill board featuring STM32F103C8 CPU
+with 20K RAM and 64K ROM. Advantages are small size, low price and great Rust
+support, which made this board one of the best to start with, but low
+quality and cheap counterfeit chip clones, that flooded the market make this
+option less appealing, but it is still reasonable option to start with.
+
+## Other Boards
+
+After playing with Blue Pill, i also tried its more expensive, but much more
+capable counter part Black Pill - more demos and examples for Black
+Pill development board can be found in the
+[black-pill-rust](https://github.com/viktorchvatal/black-pill-rust) repository
+
+During 2020, another $5 alternative to the Blue Pill emerged - a Raspberry PI
+Pico board, carrying @ computing cores and tons of RAM and 2MB of onboard Flash
+memory. My experiments with the RPi Pico are in the [rpi-pico-rust](https://github.com/viktorchvatal/rpi-pico-rust) repository.
+
+Most drivers used in all the demos across different boards use platform-agnostic
+device drivers written on top of `embedded_hal` crate, so than can be easily
+transferred across all mentioned development boards.
 
 ## Userful Resources
 
