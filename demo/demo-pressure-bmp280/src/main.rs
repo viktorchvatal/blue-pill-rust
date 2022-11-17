@@ -130,11 +130,11 @@ fn print_measurement(
     let pressure = raw_pressure/256;
 
     Text::new(&TEMPERATURE, Point::new(0, 15), regular).draw(frame_buffer).map_err(|_| ())?;
-    write!(&mut text, "{}.{} C", raw_temp/100, raw_temp % 100).map_err(|_| ())?;
+    write!(&mut text, "{}.{:02} C", raw_temp/100, raw_temp % 100).map_err(|_| ())?;
     Text::new(&text, Point::new(0, 30), bold).draw(frame_buffer).map_err(|_| ())?;
     Text::new(&PRESSURE, Point::new(0, 45), regular).draw(frame_buffer).map_err(|_| ())?;
     text.clear();
-    write!(&mut text, "{}.{} hPa", pressure/100, pressure % 100).map_err(|_| ())?;
+    write!(&mut text, "{}.{:02} hPa", pressure/100, pressure % 100).map_err(|_| ())?;
     Text::new(&text, Point::new(0, 60), bold).draw(frame_buffer).map_err(|_| ())?;
 
     Ok(())
