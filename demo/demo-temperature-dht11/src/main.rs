@@ -59,7 +59,7 @@ fn main() -> ! {
         clocks,
     );
 
-    let thermo_pin = gpiob.pb7.into_open_drain_output(&mut gpiob.crl);
+    let thermo_pin = gpiob.pb5.into_open_drain_output(&mut gpiob.crl);
 
     let mut delay = cp.SYST.delay(&clocks);
 
