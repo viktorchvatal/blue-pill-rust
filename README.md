@@ -33,12 +33,12 @@ Pill development board can be found in the
 [black-pill-rust](https://github.com/viktorchvatal/black-pill-rust) repository
 
 During 2020, another $5 alternative to the Blue Pill emerged - a Raspberry PI
-Pico board, carrying @ computing cores and tons of RAM and 2MB of onboard Flash
+Pico board, carrying two computing cores and tons of RAM and 2MB of onboard Flash
 memory. My experiments with the RPi Pico are in the [rpi-pico-rust](https://github.com/viktorchvatal/rpi-pico-rust) repository.
 
 Most drivers used in all the demos across different boards use platform-agnostic
 device drivers written on top of `embedded_hal` crate, so than can be easily
-transferred across all mentioned development boards.
+transferred across from one board to another.
 
 ## Userful Resources
 
