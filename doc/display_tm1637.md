@@ -48,7 +48,7 @@ https://www.laskarduino.cz/hodinovy-displej-tm1637--cerveny/
 ## Connection
 
 | MCU Board   |     Other     | TM1367 Board |
-| ----------- |               | ------------ |
+| ----------- | ------------- | ------------ |
 | PB9         |               | CLK          |
 | PB8         |               | DIO          |
 | -           |    VCC        | VCC          |
