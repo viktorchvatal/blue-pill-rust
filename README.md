@@ -5,6 +5,8 @@ My personal walk through learning Rust development on STM32 family of microcontr
  - Blue Pill development board with STM32F103C8 microcontroller as target device
  - STLink v2 as a programming and debugging interface
  - Debian 10/11 bullseye and Visual studio code as development environment
+ - **Pros:** cheap board ($5), small-factor, breadboard-friendly, good Rust support
+ - **Cons:** market is flooded with counterfeit chips, harder to find high quality boards
 
 ## Motivation
 
