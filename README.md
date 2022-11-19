@@ -77,19 +77,26 @@ display driven by TM1637 circuit using `tm1637` crate
 
 ![LED Display connected](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/display-tm1637/connected-display-small.jpg)
 
-## Drawing on HX1230 Matrix Graphical Display [in progress]
+## HX1230 Matrix Graphical Display [in progress]
 
 [HX1230 Graphical display demo](doc/display_hx1230.md) - communicating
 with the HX1230 graphical display
 
 ![HX1230 Display](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/display-hx1230/hx1230-small.gif)
 
-## Interfacing DHT11 Temperature and humidity sensor [in progress]
+## DHT11 Temperature and humidity sensor [in progress]
 
 [DHT11 Temperature and humidity sensor demo](doc/temperature-dht11.md) - communicating
 with the HX1230 graphical display
 
 ![HX1230 Display](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/temperature-dht11/dht11-small.jpg)
+
+## BMP280 Pressure and Temperature sensor [in progress]
+
+[BMP280 Pressure and Temperature sensor](doc/bmp280.md) - communicating
+with the HX1230 graphical display
+
+![BMP280 Pressure and Temperature sensor](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/pressure-bmp280/bmp280-small.jpg)
 
 ## Other
 
