@@ -10,14 +10,14 @@ library does exactly this, it ends the program in the infinite loop on the
 panic.
 
 To use `panic-halt`, set the dependency in
-[Cargo.toml](../demo/demo-blinky-standalone/Cargo.toml)
+[Cargo.toml](../app/demo-blinky-standalone/Cargo.toml)
 
 ```
 [dependencies]
 panic-halt = "0.2.0"
 ```
 
-and import the library in [main.rs](../demo/demo-blinky-standalone/src/main.rs)
+and import the library in [main.rs](../app/demo-blinky-standalone/src/main.rs)
 
 ```
 use panic_halt as _;
@@ -62,7 +62,7 @@ ground
 
 ![Panic led connection schematic](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/panic-handling/panic-led-schematic.png)
 
-A [demo-panic-led](../demo/demo-panic-led/src/main.rs) can be started
+A [demo-panic-led](../app/demo-panic-led/src/main.rs) can be started
 using `cargo run --bin demo-panic-led`
 
 Oh, did our program really panic?
@@ -76,7 +76,7 @@ to connect the debugger and enable the semihosting panic setup.
 
 To enable panic semihosting, add semihosting support and panic handling library
 into the dependencies (or see
-[demo-blinky-semihosting](../demo/demo-blinky-semihosting/src/main.rs) how to do it)
+[demo-blinky-semihosting](../app/demo-blinky-semihosting/src/main.rs) how to do it)
 
 ```rust
 cortex-m-semihosting = "0.3.3"

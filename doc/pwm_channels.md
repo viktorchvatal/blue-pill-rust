@@ -1,6 +1,6 @@
 # PWN Channels and colored LEDs [in progress]
 
-Example code: [demo-pwm/src/main.rs](../demo/demo-pwm/src/main.rs)
+Example code: [demo-pwm/src/main.rs](../app/demo-pwm/src/main.rs)
 
 ![PWM LEDs](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/pwm-channels/pwm-leds.gif)
 

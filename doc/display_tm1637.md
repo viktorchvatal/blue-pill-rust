@@ -1,6 +1,6 @@
 # LED display with TM1637 Driver
 
-Example code: [demo-display-tm1637/src/main.rs](../demo/demo-display-tm1637/src/main.rs)
+Example code: [demo-display-tm1637/src/main.rs](../app/demo-display-tm1637/src/main.rs)
 
 OK, during the first attempt, i tried to write interfacing code myself,
 but communication needed to change data Pin state between push-pull mode
@@ -26,7 +26,7 @@ I have used `PB9` and `PB8` to drive the display
 ```
 
 Example code of the `tm1637` crate usage is in the
-[demo-display-tm1637](../demo/demo-display-tm1637/src/main.rs) crate.
+[demo-display-tm1637](../app/demo-display-tm1637/src/main.rs) crate.
 
 ![LED Display connected](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/display-tm1637/connected-display.jpg)
 
