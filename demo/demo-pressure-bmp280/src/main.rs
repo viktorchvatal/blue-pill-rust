@@ -86,7 +86,6 @@ fn main() -> ! {
     delay.delay_ms(200_u16);
 
     let config = Config::handheld_device_dynamic();
-
     let mut bmp = BMP280::new(&mut i2c, I2CAddress::SdoGrounded, config).unwrap();
 
     loop {
