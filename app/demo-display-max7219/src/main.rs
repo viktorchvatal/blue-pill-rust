@@ -58,7 +58,7 @@ fn main() -> ! {
         data.copy_from_slice(&buffer[shift..(shift + 8)]);
 
         display.write_str(0, &data, 0x00).unwrap();
-        display.set_intensity(0, 0x0f).unwrap();
+        display.set_intensity(0, 0x02).unwrap();
         shift = (shift + 1) % 13;
 
         led.set_high();
