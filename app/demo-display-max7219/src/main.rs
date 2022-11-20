@@ -35,26 +35,33 @@ fn main() -> ! {
     let mut gpioa = dp.GPIOA.split();
     let mut gpioc = dp.GPIOC.split();
 
+    let mut delay = cp.SYST.delay(&clocks);
+
     let mut led = gpioc.pc13.into_push_pull_output(&mut gpioc.crh);
 
     // SPI2, we use only output, so there is no miso input
     let sck = gpioa.pa5.into_alternate_push_pull(&mut gpioa.crl);
     let mosi = gpioa.pa7.into_alternate_push_pull(&mut gpioa.crl);
-    let mut delay = cp.SYST.delay(&clocks);
+    let cs = gpioa.pa6.into_push_pull_output(&mut gpioa.crl);
 
     let spi = Spi::spi1(dp.SPI1, (sck, NoMiso, mosi), &mut afio.mapr, SPI_MODE, 1.MHz(), clocks);
-    let mut display = MAX7219::from_spi(1, spi).unwrap();
+    let mut display = MAX7219::from_spi_cs(1, spi, cs).unwrap();
 
-    let mut counter: usize = 1;
+    let buffer = b"        Hello        ";
+    let mut shift: usize = 0;
+    let mut data = [0; 8];
 
     loop {
         led.set_low();
         display.power_on().unwrap();
-        display.write_str(0, b"Hello   ", 0xff).unwrap();
+        data.copy_from_slice(&buffer[shift..(shift + 8)]);
+
+        display.write_str(0, &data, 0x00).unwrap();
         display.set_intensity(0, 0x0f).unwrap();
-        counter += 1;
+        shift = (shift + 1) % 13;
+
         led.set_high();
 
-        delay.delay_ms(100_u16);
+        delay.delay_ms(300_u16);
     }
 }
