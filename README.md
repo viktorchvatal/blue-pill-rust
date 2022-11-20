@@ -98,6 +98,10 @@ with the HX1230 graphical display
 
 ![BMP280 Pressure and Temperature sensor](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/pressure-bmp280/bmp280-small.jpg)
 
+## Using MAX7219 to drive 7-segment 8-character display [in progress]
+
+[MAX7219 display](doc/display_max7219.md)
+
 ## Other
 
 [Notes](doc/notes.md)
