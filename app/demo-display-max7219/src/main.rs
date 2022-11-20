@@ -45,6 +45,7 @@ fn main() -> ! {
     let cs = gpioa.pa6.into_push_pull_output(&mut gpioa.crl);
 
     let spi = Spi::spi1(dp.SPI1, (sck, NoMiso, mosi), &mut afio.mapr, SPI_MODE, 1.MHz(), clocks);
+    delay.delay_ms(200_u16);
     let mut display = MAX7219::from_spi_cs(1, spi, cs).unwrap();
 
     let buffer = b"        Hello        ";
