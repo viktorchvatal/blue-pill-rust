@@ -8,6 +8,8 @@ My personal walk through learning Rust development on STM32 family of microcontr
  - **Pros:** cheap board ($5), small-factor, breadboard-friendly, good Rust support
  - **Cons:** market is flooded with counterfeit chips, harder to find high quality boards
 
+![stlink v2 photo](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/boards/blue-pill-board.jpg)
+
 ## Motivation
 
 After years spent with hobby project build using Atmel AVR Tiny and Mega
@@ -34,13 +36,19 @@ capable counter part Black Pill - more demos and examples for Black
 Pill development board can be found in the
 [black-pill-rust](https://github.com/viktorchvatal/black-pill-rust) repository
 
+![stlink v2 photo](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/boards/black-pill-board-small.jpg)
+
 During 2020, another $5 alternative to the Blue Pill emerged - a Raspberry PI
 Pico board, carrying two computing cores and tons of RAM and 2MB of onboard Flash
 memory. My experiments with the RPi Pico are in the [rpi-pico-rust](https://github.com/viktorchvatal/rpi-pico-rust) repository.
 
+![stlink v2 photo](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/boards/rpi-pico-board-small.jpg)
+
 Most drivers used in all the demos across different boards use platform-agnostic
 device drivers written on top of `embedded_hal` crate, so than can be easily
 transferred across from one board to another.
+
+---
 
 ## Userful Resources
 
@@ -104,3 +112,14 @@ with the HX1230 graphical display
 
 ![BMP280 Pressure and Temperature sensor](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/max7219-7segment/max7219-7segment-small.gif)
 
+---
+
+## Other projects
+
+For better equipped STM board, see [black-pill-rust](https://github.com/viktorchvatal/black-pill-rust) repository
+
+![stlink v2 photo](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/boards/black-pill-board-small.jpg)
+
+For cheap, but powerfull Raspberry PI pico board, see [rpi-pico-rust](https://github.com/viktorchvatal/rpi-pico-rust) repository.
+
+![stlink v2 photo](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/boards/rpi-pico-board-small.jpg)
