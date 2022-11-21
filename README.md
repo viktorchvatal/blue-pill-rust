@@ -102,6 +102,8 @@ with the HX1230 graphical display
 
 [MAX7219 display](doc/display_max7219.md)
 
+![BMP280 Pressure and Temperature sensor](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/max7219-7segment/max7219-7segment-small.gif)
+
 ## Other
 
 [Notes](doc/notes.md)
