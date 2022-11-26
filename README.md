@@ -40,7 +40,10 @@ Pill development board can be found in the
 
 During 2020, another $5 alternative to the Blue Pill emerged - a Raspberry PI
 Pico board, carrying two computing cores and tons of RAM and 2MB of onboard Flash
-memory. My experiments with the RPi Pico are in the [rpi-pico-rust](https://github.com/viktorchvatal/rpi-pico-rust) repository.
+memory. My experiments with the RPi Pico are in the [rpi-pico-rust](https://github.com/viktorchvatal/rpi-pico-rust) repository. Rust software ecosystem for RPi Pico is quite young to date, with some
+features still unimplemented, but considering that RPi Pico has its best years ahead and that
+it features best value for money compared to other boards, as of 2022 it would be my
+preferred board to start ARM Rust development.
 
 ![stlink v2 photo](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/boards/rpi-pico-board-small.jpg)
 
