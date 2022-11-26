@@ -2,7 +2,8 @@
 
 My personal walk through learning Rust development on STM32 family of microcontrollers, using:
 
- - Blue Pill development board with STM32F103C8 microcontroller as target device
+ - Blue Pill development board with STM32F103C8 microcontroller as target device,
+   featuring 20K RAM and 64K flash
  - STLink v2 as a programming and debugging interface
  - Debian 10/11 bullseye and Visual studio code as development environment
  - **Pros:** cheap board ($5), small-factor, breadboard-friendly, good Rust support
@@ -114,15 +115,3 @@ with the HX1230 graphical display
 [MAX7219 display](doc/display_max7219.md)
 
 ![BMP280 Pressure and Temperature sensor](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/max7219-7segment/max7219-7segment-small.gif)
-
----
-
-## Other projects
-
-For better equipped STM board, see [black-pill-rust](https://github.com/viktorchvatal/black-pill-rust) repository
-
-![stlink v2 photo](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/boards/black-pill-board-small.jpg)
-
-For cheap, but powerfull Raspberry PI pico board, see [rpi-pico-rust](https://github.com/viktorchvatal/rpi-pico-rust) repository.
-
-![stlink v2 photo](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/boards/rpi-pico-board-small.jpg)
