@@ -89,7 +89,7 @@ display driven by TM1637 circuit using `tm1637` crate
 
 ![LED Display connected](https://raw.githubusercontent.com/viktorchvatal/blue-pill-rust-assets/master/display-tm1637/connected-display-small.jpg)
 
-## HX1230 Matrix Graphical Display [in progress]
+## HX1230 Matrix Graphical Display
 
 [HX1230 Graphical display demo](doc/display_hx1230.md) - communicating
 with the HX1230 graphical display
